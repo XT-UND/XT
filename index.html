@@ -1,265 +1,686 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XT UND Leaderboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XT UND Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+      /* Base Settings */
       body {
-        font-family: 'Orbitron', sans-serif;
-        background-color: #0a0a0a;
-        color: white;
-        padding-bottom: 80px; /* Space for footer */
+        font-family: 'Inter', sans-serif; /* UI Font */
+        background-color: #121212;
+        color: #e5e5e5;
+        padding-bottom: 90px; /* Space for bottom nav */
+        -webkit-tap-highlight-color: transparent;
       }
       
+      /* Gamer Font for specific headers */
+      .font-gamer { font-family: 'Orbitron', sans-serif; }
+
       /* Custom scrollbar */
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
       ::-webkit-scrollbar-track { background: #1a1a1a; }
-      ::-webkit-scrollbar-thumb { background: #ea580c; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+      ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+      
+      /* Hide scrollbar for horizontal scroll areas but keep functionality */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-      /* Animation classes */
-      .fade-in { animation: fadeIn 0.3s ease-in-out; }
-      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      /* Animations */
+      .fade-in { animation: fadeIn 0.2s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-      .skew-btn {
-          transform: skew(-10deg);
+      /* Input Styles */
+      .input-modern {
+          background: #1e1e1e;
+          border: 1px solid #333;
+          color: white;
+          border-radius: 8px;
+          padding: 10px 12px;
+          font-size: 14px;
           transition: all 0.2s;
-      }
-      .skew-btn span {
-          transform: skew(10deg);
-          display: block;
-      }
-      .skew-btn:hover {
-          transform: skew(-10deg) scale(1.05);
-      }
-      .skew-btn.active {
-          transform: skew(-10deg) scale(1.05);
-          box-shadow: 0 0 15px rgba(249,115,22,0.8);
-      }
-
-      input[type="range"] {
-          -webkit-appearance: none;
-          background: transparent;
-      }
-      input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: #ea580c;
-          cursor: pointer;
-          margin-top: -6px;
-      }
-      input[type="range"]::-webkit-slider-runnable-track {
           width: 100%;
-          height: 4px;
-          cursor: pointer;
-          background: #333;
-          border-radius: 2px;
+          outline: none;
       }
-    </style>
-<link rel="stylesheet" href="/index.css">
-</head>
-<body class="min-h-screen">
+      .input-modern:focus {
+          border-color: #ea580c;
+          background: #252525;
+      }
+      
+      .input-compact {
+          background: #121212;
+          border: 1px solid #333;
+          color: white;
+          border-radius: 4px;
+          padding: 4px;
+          font-size: 12px;
+          text-align: center;
+          width: 100%;
+          outline: none;
+          transition: border-color 0.2s;
+      }
+      .input-compact:focus { border-color: #ea580c; }
+      
+      /* Remove arrows from number inputs */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      input[type=number] {
+        -moz-appearance: textfield;
+      }
 
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-zinc-900 to-black border-b border-orange-900 p-6 sticky top-0 z-50 shadow-lg flex justify-center">
-        <h1 class="text-4xl font-black italic tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600 drop-shadow-[0_2px_4px_rgba(234,88,12,0.5)]">
-          XT UND
-        </h1>
+      /* Card Style */
+      .card {
+          background: #1e1e1e;
+          border: 1px solid #2a2a2a;
+          border-radius: 12px;
+          padding: 16px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      }
+
+      /* File Upload Button */
+      .file-upload-btn {
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+          background-size: cover;
+          background-position: center;
+      }
+      .file-upload-btn input[type=file] {
+          position: absolute;
+          top: 0; left: 0; width: 100%; height: 100%;
+          opacity: 0;
+          cursor: pointer;
+          z-index: 10;
+      }
+
+      /* Leaderboard Specific Styles */
+      .text-gold { color: #fbbf24; }
+      .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+      .text-shadow-sm { text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+      
+      .bg-rank-1 { background: linear-gradient(90deg, #ea580c 0%, #9a3412 100%); }
+      .bg-rank-3 { background: linear-gradient(90deg, #9a3412 0%, #431407 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top App Bar -->
+    <header class="bg-[#1a1a1a] border-b border-[#333] sticky top-0 z-50">
+        <div class="px-4 py-3 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-900/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                    </svg>
+                </div>
+                <h1 class="text-lg font-bold text-white tracking-wide font-gamer"><span id="app-header-title">XT UND</span> <span class="text-orange-500 text-xs font-normal align-middle ml-1">MANAGER</span></h1>
+            </div>
+            <div class="text-xs text-gray-500 font-medium">v4.2</div>
+        </div>
+        
+        <!-- Group Selector (Horizontal Scroll) -->
+        <div class="px-2 pb-2 bg-[#1a1a1a]">
+            <div id="group-selector" class="flex gap-2 overflow-x-auto no-scrollbar py-1 px-2">
+                <!-- Injected by JS -->
+            </div>
+        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8">
-        
-        <!-- Group Selector -->
-        <div id="group-selector" class="flex flex-wrap justify-center gap-2 mb-8">
-            <!-- Buttons injected by JS -->
+    <main class="flex-1 max-w-md md:max-w-4xl mx-auto w-full p-4">
+
+        <!-- VIEW: LEADERBOARD -->
+        <div id="view-leaderboard" class="fade-in hidden w-full flex-col items-center">
+             
+             <!-- Action Bar -->
+             <div class="w-full flex justify-between items-center mb-4">
+                 <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Results Board</h2>
+                 <button onclick="downloadImage('capture-area')" class="bg-orange-600 active:bg-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-orange-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                    <span>💾 SAVE BOARD</span>
+                </button>
+             </div>
+
+             <!-- Capture Area: Leaderboard -->
+             <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-10 border border-zinc-800">
+                 <div id="capture-area" class="min-w-[550px] w-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center overflow-hidden shrink-0">
+                     <!-- Content injected by JS -->
+                 </div>
+             </div>
+
+             <!-- Action Bar Top 3 -->
+             <div class="w-full flex justify-between items-center mb-4 border-t border-zinc-800 pt-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Top 3 Banner</h2>
+                <button onclick="downloadImage('capture-area-top3')" class="bg-yellow-500 active:bg-yellow-600 text-black px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-yellow-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                   <span>💾 SAVE TOP 3</span>
+               </button>
+            </div>
+
+             <!-- Capture Area: Top 3 Banner -->
+             <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-10 border border-zinc-800">
+                <div id="capture-area-top3" class="min-w-[550px] w-[550px] h-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center justify-between overflow-hidden shrink-0">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+
+            <!-- Action Bar Confirmed Teams -->
+            <div class="w-full flex justify-between items-center mb-4 border-t border-zinc-800 pt-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Confirmed Teams</h2>
+                <button onclick="downloadImage('capture-area-confirmed')" class="bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-blue-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                   <span>💾 SAVE TEAMS</span>
+               </button>
+            </div>
+
+             <!-- Capture Area: Confirmed Teams -->
+             <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-8 border border-zinc-800">
+                <div id="capture-area-confirmed" class="min-w-[550px] w-[550px] h-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center justify-between overflow-hidden shrink-0">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
         </div>
 
-        <!-- Style Editor (Hidden by default) -->
-        <div id="style-editor" class="hidden bg-zinc-900 border border-orange-800 p-6 rounded-lg mb-8 shadow-2xl fade-in max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-6 border-b border-orange-900 pb-4">
-                <h3 class="text-xl text-orange-500 font-bold uppercase">Visual Customization</h3>
-                <button onclick="toggleEditor()" class="text-red-500 uppercase text-xs font-bold hover:text-red-400">Close</button>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <!-- Colors -->
-                 <div class="space-y-4">
-                    <h4 class="text-white text-sm uppercase tracking-widest border-l-4 border-orange-600 pl-2">Palette</h4>
-                    <label class="flex items-center justify-between text-gray-300 text-sm">Container <input type="color" id="containerBg" class="ml-2 h-8 w-12 bg-transparent border border-gray-600 cursor-pointer"></label>
-                    <label class="flex items-center justify-between text-gray-300 text-sm">Header BG <input type="color" id="headerBg" class="ml-2 h-8 w-12 bg-transparent border border-gray-600 cursor-pointer"></label>
-                    <label class="flex items-center justify-between text-gray-300 text-sm">Header Text <input type="color" id="headerText" class="ml-2 h-8 w-12 bg-transparent border border-gray-600 cursor-pointer"></label>
-                    <label class="flex items-center justify-between text-gray-300 text-sm">Row BG <input type="color" id="rowBg" class="ml-2 h-8 w-12 bg-transparent border border-gray-600 cursor-pointer"></label>
-                    <label class="flex items-center justify-between text-gray-300 text-sm">Row Text <input type="color" id="rowText" class="ml-2 h-8 w-12 bg-transparent border border-gray-600 cursor-pointer"></label>
-                 </div>
-                 
-                 <!-- Geometry -->
-                 <div class="space-y-4">
-                    <h4 class="text-white text-sm uppercase tracking-widest border-l-4 border-orange-600 pl-2">Geometry</h4>
-                    <div class="space-y-2">
-                        <label class="text-gray-300 text-sm block">Table Radius <span id="val-tableRadius"></span></label>
-                        <input type="range" id="tableRadius" min="0" max="50" class="w-full">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-gray-300 text-sm block">Cell Radius <span id="val-cellRadius"></span></label>
-                        <input type="range" id="cellRadius" min="0" max="20" class="w-full">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-gray-300 text-sm block">Skew Angle <span id="val-skew"></span></label>
-                        <input type="range" id="skew" min="-45" max="45" class="w-full">
-                    </div>
-                 </div>
+        <!-- VIEW: EDITOR (Data Entry) -->
+        <div id="view-register" class="fade-in hidden w-full">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="w-1 h-6 bg-orange-600 rounded-full block"></span>
+                Edit Group <span id="reg-group-title" class="text-orange-500">A</span>
+            </h2>
 
-                 <div class="flex items-end justify-center pb-2">
-                    <button onclick="resetStyles()" class="w-full bg-zinc-800 border-2 border-zinc-700 text-gray-300 hover:bg-zinc-700 py-2 font-bold uppercase tracking-wider transform skew-x-[-10deg]">
-                        <span class="block skew-x-[10deg]">Reset Default</span>
-                    </button>
-                 </div>
-            </div>
-        </div>
+            <!-- Add Team Card -->
+            <div class="card mb-6 bg-[#1a1a1a] border-[#333]">
+                <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Add New Team</h3>
+                <form id="add-team-form" class="flex gap-2 items-start">
+                    <div class="flex-1">
+                        <input type="text" id="new-team-name" class="input-modern" placeholder="Team Name" required>
+                    </div>
+                    
+                    <div class="file-upload-btn w-12 h-11 bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center hover:border-orange-500 transition-colors shrink-0">
+                         <span class="text-xl">🛡️</span>
+                         <input type="file" id="new-team-logo" accept="image/*">
+                    </div>
 
-        <!-- Registration View -->
-        <div id="view-register" class="hidden fade-in max-w-4xl mx-auto">
-            <div class="bg-zinc-900/90 border border-orange-500/30 p-6 rounded-lg shadow-xl mb-8">
-                <h3 class="text-2xl text-orange-500 mb-6 font-bold uppercase border-b border-gray-700 pb-2">
-                  Register Result <span id="reg-group-title" class="text-white text-lg ml-2 opacity-50"></span>
-                </h3>
-                <form id="add-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div class="md:col-span-1">
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Team Name</label>
-                        <input type="text" id="input-name" class="w-full bg-black border border-orange-900 text-orange-100 p-2 focus:border-orange-500 outline-none" placeholder="e.g. Underfire" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Position (#)</label>
-                        <input type="number" id="input-pos" class="w-full bg-black border border-orange-900 text-orange-100 p-2 focus:border-orange-500 outline-none" placeholder="1-12" required min="1">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-1">Kills</label>
-                        <input type="number" id="input-kills" class="w-full bg-black border border-orange-900 text-orange-100 p-2 focus:border-orange-500 outline-none" placeholder="0" required min="0">
-                    </div>
-                    <button type="submit" class="bg-orange-600 border-2 border-orange-600 text-black hover:bg-orange-500 font-bold uppercase px-4 py-2 h-[42px] transform skew-x-[-10deg]">
-                        <span class="block skew-x-[10deg]">Add</span>
+                    <button type="submit" class="bg-white text-black font-bold h-11 px-4 rounded-lg hover:bg-gray-200 active:scale-95 transition-transform">
+                        Add
                     </button>
                 </form>
             </div>
 
-            <div class="bg-zinc-900/90 border border-zinc-800 rounded-lg overflow-hidden">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-zinc-800 text-orange-500 uppercase text-xs tracking-wider">
-                            <th class="p-4">Team</th>
-                            <th class="p-4 text-center">Pos</th>
-                            <th class="p-4 text-center">Kills</th>
-                            <th class="p-4 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="records-table-body" class="divide-y divide-zinc-800">
-                        <!-- Rows injected by JS -->
-                    </tbody>
-                </table>
+            <!-- List of Teams -->
+            <div id="teams-list" class="space-y-4">
+                <!-- Injected by JS -->
             </div>
+            
+            <div class="h-12"></div>
         </div>
 
-        <!-- Leaderboard View -->
-        <div id="view-leaderboard" class="fade-in flex flex-col items-center w-full">
-             <div class="mb-6">
-                <button onclick="downloadImage()" class="bg-orange-500 border-2 border-orange-500 text-black shadow-[0_0_15px_rgba(249,115,22,0.8)] px-4 py-2 font-bold uppercase tracking-wider transition-all transform skew-x-[-10deg] hover:scale-105">
-                    <span class="block skew-x-[10deg]">Download Image</span>
-                </button>
-             </div>
+        <!-- VIEW: SETTINGS (Style Editor) -->
+        <div id="view-style" class="fade-in hidden w-full pb-8">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="w-1 h-6 bg-blue-500 rounded-full block"></span>
+                Tournament Settings
+            </h2>
+            
+            <div class="space-y-6">
+                
+                <!-- Section: Info -->
+                <div class="card">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Information</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">Tournament Name</label>
+                            <input type="text" id="tournamentName" class="input-modern" placeholder="XT UND">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-xs text-gray-500 block mb-1">Date</label>
+                                <input type="text" id="tournamentDate" class="input-modern" placeholder="DD/MM/YYYY">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 block mb-1">Time</label>
+                                <input type="text" id="tournamentTime" class="input-modern" placeholder="HH:MM">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-             <!-- Table Container to Capture -->
-             <div id="capture-area" class="shadow-2xl overflow-hidden flex flex-col items-center w-full max-w-[550px]">
-                 <!-- Content injected by JS renderLeaderboard -->
-             </div>
+                <!-- Section: Footer Text -->
+                <div class="card">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Footer Text</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">Left (Small Text)</label>
+                            <input type="text" id="footerTextLeft" class="input-modern" placeholder="FREE FIRE EUROPA">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">Right (Small Text)</label>
+                            <input type="text" id="footerTextRight" class="input-modern" placeholder="XT UND">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Assets -->
+                <div class="card">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Assets</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Main Logo -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-500 block">Main Logo</label>
+                            <div id="preview-logo-container" class="file-upload-btn w-full aspect-square bg-black border border-dashed border-gray-600 rounded-lg flex flex-col items-center justify-center hover:border-orange-500 transition-colors relative">
+                                <span class="text-2xl mb-1 z-0">🛡️</span>
+                                <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
+                                <input type="file" id="logoImage" accept="image/*" class="z-20">
+                            </div>
+                            <button onclick="clearImage('logoImage')" class="w-full text-[10px] text-red-500 hover:underline">Remove Logo</button>
+                        </div>
+
+                        <!-- BG Image -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-500 block">Background</label>
+                            <div id="preview-bg-container" class="file-upload-btn w-full aspect-square bg-black border border-dashed border-gray-600 rounded-lg flex flex-col items-center justify-center hover:border-orange-500 transition-colors relative">
+                                <span class="text-2xl mb-1 z-0">🖼️</span>
+                                <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
+                                <input type="file" id="backgroundImage" accept="image/*" class="z-20">
+                            </div>
+                            <button onclick="clearImage('backgroundImage')" class="w-full text-[10px] text-red-500 hover:underline">Remove BG</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sponsors -->
+                    <div class="pt-2 border-t border-gray-800 mt-2">
+                        <label class="text-xs text-gray-500 block mb-2">Sponsors (Footer)</label>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="file-upload-btn bg-zinc-800 text-white px-3 py-2 rounded text-xs font-medium flex items-center gap-2 border border-zinc-700">
+                                <span>+ Add Sponsor</span>
+                                <input type="file" id="addSponsorInput" accept="image/*">
+                            </div>
+                        </div>
+                        <div id="sponsor-list" class="flex flex-wrap gap-2">
+                            <!-- Injected JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="pt-4">
+                    <button onclick="resetStyles()" class="w-full py-3 rounded-lg border border-red-900/50 text-red-500 text-sm font-medium hover:bg-red-900/10 transition-colors">
+                        Reset All Settings
+                    </button>
+                </div>
+                
+                <div class="pt-1">
+                    <button onclick="resetData()" class="w-full py-3 rounded-lg border border-red-900/50 text-red-500 text-sm font-medium hover:bg-red-900/10 transition-colors">
+                         Clear Group Data
+                    </button>
+                </div>
+
+            </div>
         </div>
 
     </main>
 
-    <!-- Footer Nav -->
-    <footer class="fixed bottom-0 w-full bg-black/90 backdrop-blur-sm border-t border-orange-900 p-4 z-50">
-        <div class="max-w-md mx-auto flex justify-around items-center gap-2">
-            <button onclick="setView('LEADERBOARD')" id="nav-leaderboard" class="skew-btn w-full bg-zinc-800 border-2 border-zinc-700 text-gray-300 py-2 px-2 text-xs font-bold uppercase"><span>Leaderboard</span></button>
-            <button onclick="setView('REGISTER')" id="nav-editor" class="skew-btn w-full bg-zinc-800 border-2 border-zinc-700 text-gray-300 py-2 px-2 text-xs font-bold uppercase"><span>Editor</span></button>
-            <button onclick="toggleEditor()" id="nav-style" class="skew-btn w-full bg-zinc-800 border-2 border-zinc-700 text-gray-300 py-2 px-2 text-xs font-bold uppercase"><span>🎨 Style</span></button>
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 w-full bg-[#1a1a1a]/95 backdrop-blur border-t border-[#333] z-50 pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-lg mx-auto">
+            
+            <button onclick="setView('LEADERBOARD')" id="nav-leaderboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                </svg>
+                <span class="text-[10px] font-medium">Results</span>
+            </button>
+
+            <button onclick="setView('REGISTER')" id="nav-editor" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span class="text-[10px] font-medium">Data Entry</span>
+            </button>
+
+            <button onclick="setView('STYLE')" id="nav-style" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-[10px] font-medium">Settings</span>
+            </button>
+            
         </div>
-    </footer>
+    </nav>
 
     <script>
         // --- State ---
-        const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'FINALS'];
+        const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'ESPECIAL', 'FINALS'];
         let activeGroup = 'A';
-        let currentView = 'LEADERBOARD'; // 'LEADERBOARD' or 'REGISTER'
-        let isEditorOpen = false;
+        let currentView = 'LEADERBOARD'; 
         
-        let data = { A: [], B: [], C: [], D: [], E: [], F: [], FINALS: [] };
+        // Data Structure V2: { [Group]: [ { id, name, logo, matches: [ {p, k}, ... ] } ] }
+        let data = { A: [], B: [], C: [], D: [], E: [], F: [], ESPECIAL: [], FINALS: [] };
         
         const DEFAULT_STYLES = {
-            containerBg: '#B46618',
-            headerBg: '#ea580c',
-            headerText: '#000000',
-            rowBg: '#000000',
-            rowText: '#ea580c',
-            tableRadius: 0,
-            cellRadius: 0,
-            skew: -20,
+            tournamentName: 'XT UND',
+            tournamentDate: '24/11/2025',
+            tournamentTime: '20:00 HRS',
+            footerTextLeft: 'EUROPA FREE FIRE',
+            footerTextCenter: '',
+            footerTextRight: 'XT UND SERIES',
+            logoImage: null, 
+            backgroundImage: null, 
+            sponsorLogos: [],
         };
         let styles = { ...DEFAULT_STYLES };
 
         // --- Persistence ---
         function loadData() {
-            const storedData = localStorage.getItem('xt_und_data_v1');
-            if (storedData) data = JSON.parse(storedData);
-            
-            const storedStyles = localStorage.getItem('xt_und_styles');
-            if (storedStyles) styles = JSON.parse(storedStyles);
+            try {
+                // v2 Data Structure
+                const storedData = localStorage.getItem('xt_und_data_v2');
+                if (storedData) {
+                    data = JSON.parse(storedData);
+                    // Ensure new keys exist if loading old data
+                    if(!data.ESPECIAL) data.ESPECIAL = [];
+                }
+                
+                const storedStyles = localStorage.getItem('xt_und_styles_v3'); 
+                if (storedStyles) {
+                    const parsed = JSON.parse(storedStyles);
+                    if (parsed.sponsorLogo && (!parsed.sponsorLogos || parsed.sponsorLogos.length === 0)) {
+                        parsed.sponsorLogos = [parsed.sponsorLogo];
+                    }
+                    styles = { ...DEFAULT_STYLES, ...parsed };
+                }
+
+                const storedGroup = localStorage.getItem('xt_und_active_group');
+                if (storedGroup && GROUPS.includes(storedGroup)) activeGroup = storedGroup;
+            } catch (e) {
+                console.error("Error loading data", e);
+            }
         }
 
         function saveData() {
-            localStorage.setItem('xt_und_data_v1', JSON.stringify(data));
+            try {
+                localStorage.setItem('xt_und_data_v2', JSON.stringify(data));
+                localStorage.setItem('xt_und_active_group', activeGroup);
+            } catch (e) {
+                console.error(e);
+                alert("Storage Warning: LocalStorage full.");
+            }
         }
 
         function saveStyles() {
-            localStorage.setItem('xt_und_styles', JSON.stringify(styles));
+            try {
+                localStorage.setItem('xt_und_styles_v3', JSON.stringify(styles));
+            } catch (e) {
+                console.error(e);
+                alert("Storage Full: Images too large.");
+            }
         }
 
         // --- Logic ---
-        function calculatePoints(pos, kills) {
+        function calculateMatchPoints(pos, kills) {
+            if(!pos) return 0;
             let pts = 0;
-            if (pos === 1) pts = 12;
-            else if (pos === 2) pts = 9;
-            else if (pos === 3) pts = 8;
-            else if (pos === 4) pts = 7;
-            else if (pos === 5) pts = 6;
-            else if (pos === 6) pts = 5;
-            else if (pos === 7) pts = 4;
-            else if (pos === 8) pts = 3;
-            else if (pos === 9) pts = 2;
-            else if (pos === 10) pts = 1;
-            return pts + kills;
+            const p = parseInt(pos);
+            const k = parseInt(kills) || 0;
+
+            if (p === 1) pts = 12;
+            else if (p === 2) pts = 9;
+            else if (p === 3) pts = 8;
+            else if (p === 4) pts = 7;
+            else if (p === 5) pts = 6;
+            else if (p === 6) pts = 5;
+            else if (p === 7) pts = 4;
+            else if (p === 8) pts = 3;
+            else if (p === 9) pts = 2;
+            else if (p === 10) pts = 1;
+            
+            return pts + k;
         }
 
         function getAggregatedData(group) {
-            const records = data[group] || [];
-            const teamMap = new Map();
+            const teams = data[group] || [];
+            
+            const processed = teams.map(t => {
+                let totalPoints = 0;
+                let totalKills = 0;
+                let booyahs = 0;
 
-            records.forEach(r => {
-                const name = r.teamName.trim();
-                if (!teamMap.has(name)) {
-                    teamMap.set(name, { name: name, booyah: 0, kills: 0, points: 0 });
-                }
-                const team = teamMap.get(name);
-                team.kills += r.kills;
-                team.points += calculatePoints(r.position, r.kills);
-                if (r.position === 1) team.booyah += 1;
+                t.matches.forEach(m => {
+                    const k = parseInt(m.k) || 0;
+                    const p = parseInt(m.p);
+                    if(p === 1) booyahs++;
+                    totalKills += k;
+                    totalPoints += calculateMatchPoints(m.p, m.k);
+                });
+
+                return {
+                    ...t,
+                    points: totalPoints,
+                    kills: totalKills,
+                    booyah: booyahs
+                };
             });
 
-            return Array.from(teamMap.values()).sort((a, b) => b.points - a.points);
+            return processed.sort((a, b) => {
+                if(b.points !== a.points) return b.points - a.points;
+                return b.kills - a.kills;
+            });
+        }
+
+        // --- Navigation ---
+        function setView(view) {
+            currentView = view;
+            
+            // Toggle visibility
+            document.getElementById('view-leaderboard').classList.add('hidden');
+            document.getElementById('view-register').classList.add('hidden');
+            document.getElementById('view-style').classList.add('hidden');
+            document.getElementById('view-leaderboard').classList.remove('flex');
+
+            if (view === 'LEADERBOARD') {
+                document.getElementById('view-leaderboard').classList.remove('hidden');
+                document.getElementById('view-leaderboard').classList.add('flex');
+                renderAll();
+            } else if (view === 'REGISTER') {
+                document.getElementById('view-register').classList.remove('hidden');
+                renderTeamEditor();
+            } else if (view === 'STYLE') {
+                document.getElementById('view-style').classList.remove('hidden');
+                // Sync inputs
+                document.getElementById('tournamentName').value = styles.tournamentName || '';
+                document.getElementById('tournamentDate').value = styles.tournamentDate || '';
+                document.getElementById('tournamentTime').value = styles.tournamentTime || '';
+                document.getElementById('footerTextLeft').value = styles.footerTextLeft || '';
+                document.getElementById('footerTextRight').value = styles.footerTextRight || '';
+                renderSponsorListInSettings();
+            }
+
+            // Update Nav Icons
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('text-orange-500'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-gray-500'));
+            
+            if(view === 'LEADERBOARD') document.getElementById('nav-leaderboard').classList.add('text-orange-500');
+            if(view === 'REGISTER') document.getElementById('nav-editor').classList.add('text-orange-500');
+            if(view === 'STYLE') document.getElementById('nav-style').classList.add('text-orange-500');
+        }
+
+        function renderAll() {
+            renderLeaderboard();
+            renderTop3Banner();
+            renderConfirmedTeamsBanner();
+            document.getElementById('app-header-title').textContent = styles.tournamentName || 'XT UND';
+        }
+
+        // --- Actions ---
+        function updateMatch(id, index, type, value) {
+            const teams = data[activeGroup];
+            const team = teams.find(t => t.id === id);
+            if(team) {
+                if(!team.matches[index]) team.matches[index] = {p:'', k:''};
+                team.matches[index][type] = value;
+                saveData();
+            }
+        }
+
+        function updateTeamName(id, value) {
+            const team = data[activeGroup].find(t => t.id === id);
+            if(team) {
+                team.name = value;
+                saveData();
+            }
+        }
+
+        function updateTeamLogo(id, input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const team = data[activeGroup].find(t => t.id === id);
+                    if(team) {
+                        team.logo = e.target.result;
+                        saveData();
+                        renderTeamEditor(); 
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function deleteTeam(id) {
+            if(confirm('Delete this team?')) {
+                data[activeGroup] = data[activeGroup].filter(t => t.id !== id);
+                saveData();
+                renderTeamEditor();
+            }
+        }
+
+        function resetStyles() {
+            if(confirm('Reset all styles?')) {
+                styles = { ...DEFAULT_STYLES };
+                saveStyles();
+                setView('STYLE');
+                renderAll();
+            }
+        }
+
+        function resetData() {
+            if(confirm(`Clear all data for Group ${activeGroup}?`)) {
+                data[activeGroup] = [];
+                saveData();
+                renderTeamEditor();
+                renderAll();
+            }
+        }
+
+        function downloadImage(elementId) {
+            const element = document.getElementById(elementId);
+            
+            // Fix for shifting content during capture:
+            // Explicitly force width/height and reset scroll positions in options
+            const options = {
+                scale: 3, // High resolution
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null, // Keep existing background
+                width: 550, // Fixed width based on our CSS
+                height: element.scrollHeight, // Full height
+                scrollX: 0,
+                scrollY: 0,
+                onclone: (clonedDoc) => {
+                    // Ensure the cloned element is perfectly aligned and ignores external margins
+                    const clonedElement = clonedDoc.getElementById(elementId);
+                    if(clonedElement) {
+                        clonedElement.style.margin = '0';
+                        clonedElement.style.transform = 'none';
+                        // Force fixed dimensions again on style to be sure
+                        clonedElement.style.width = '550px';
+                        clonedElement.style.height = elementId !== 'capture-area' ? '550px' : 'auto';
+                    }
+                }
+            };
+
+            html2canvas(element, options).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${(styles.tournamentName || 'XT_UND').replace(/\s+/g,'_')}_${elementId}_${activeGroup}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function clearImage(key) {
+            styles[key] = null;
+            saveStyles();
+            
+            // Reset preview
+            if(key === 'logoImage') {
+                 const container = document.getElementById('preview-logo-container');
+                 const input = container.querySelector('input');
+                 container.innerHTML = `
+                    <span class="text-2xl mb-1 z-0">🛡️</span>
+                    <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
+                 `;
+                 container.appendChild(input);
+            }
+            if(key === 'backgroundImage') {
+                 const container = document.getElementById('preview-bg-container');
+                 const input = container.querySelector('input');
+                 container.innerHTML = `
+                    <span class="text-2xl mb-1 z-0">🖼️</span>
+                    <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
+                 `;
+                 container.appendChild(input);
+            }
+            renderAll();
+        }
+
+        function handleImageUpload(e, key) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    styles[key] = evt.target.result;
+                    saveStyles();
+                    renderAll();
+                    
+                    // Show Preview
+                    const containerId = key === 'logoImage' ? 'preview-logo-container' : 'preview-bg-container';
+                    const container = document.getElementById(containerId);
+                    const input = container.querySelector('input');
+                    
+                    const img = document.createElement('img');
+                    img.src = evt.target.result;
+                    img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
+                    
+                    container.innerHTML = '';
+                    container.appendChild(img);
+                    container.appendChild(input);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderSponsorListInSettings() {
+            const container = document.getElementById('sponsor-list');
+            container.innerHTML = '';
+            (styles.sponsorLogos || []).forEach((logo, idx) => {
+                const div = document.createElement('div');
+                div.className = 'relative w-10 h-10 border border-zinc-700 rounded bg-black flex items-center justify-center';
+                div.innerHTML = `
+                    <img src="${logo}" class="max-w-full max-h-full object-contain">
+                    <button onclick="removeSponsor(${idx})" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px]">&times;</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeSponsor(idx) {
+            styles.sponsorLogos.splice(idx, 1);
+            saveStyles();
+            renderSponsorListInSettings();
+            renderAll();
         }
 
         // --- UI Rendering ---
@@ -268,43 +689,105 @@
             const container = document.getElementById('group-selector');
             container.innerHTML = '';
             GROUPS.forEach(g => {
+                const isActive = activeGroup === g;
                 const btn = document.createElement('button');
-                btn.className = `skew-btn min-w-[80px] px-4 py-2 font-bold uppercase tracking-wider border-2 ${
-                    activeGroup === g 
-                    ? 'bg-orange-600 border-orange-600 text-black shadow-[0_0_10px_rgba(234,88,12,0.5)]' 
-                    : 'bg-zinc-800 border-zinc-700 text-gray-300 hover:bg-zinc-700'
+                btn.className = `whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    isActive 
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-900/40' 
+                    : 'bg-[#2a2a2a] text-gray-400 border border-[#333]'
                 }`;
-                btn.innerHTML = `<span>${g === 'FINALS' ? 'FINALS' : 'GR ' + g}</span>`;
-                btn.onclick = () => { activeGroup = g; renderAll(); };
+                // Special naming for ESPECIAL and FINALS
+                let btnText = `GR ${g}`;
+                if (g === 'FINALS') btnText = 'FINALS';
+                if (g === 'ESPECIAL') btnText = 'ESPECIAL';
+                
+                btn.textContent = btnText;
+                btn.onclick = () => { 
+                    activeGroup = g; 
+                    saveData(); 
+                    renderAll(); 
+                    if(currentView === 'REGISTER') renderTeamEditor();
+                };
                 container.appendChild(btn);
             });
+            setTimeout(() => {
+                 const activeBtn = container.querySelector('.bg-orange-600');
+                 if(activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }, 50);
         }
 
-        function renderRegistration() {
-            document.getElementById('reg-group-title').textContent = `/ Group ${activeGroup}`;
-            const tbody = document.getElementById('records-table-body');
-            tbody.innerHTML = '';
+        function renderTeamEditor() {
+            document.getElementById('reg-group-title').textContent = activeGroup;
+            const list = document.getElementById('teams-list');
+            list.innerHTML = '';
             
-            const records = data[activeGroup] || [];
-            if (records.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-500 italic">No matches recorded for Group ${activeGroup} yet.</td></tr>`;
+            const teams = data[activeGroup] || [];
+            if (teams.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-10 text-gray-600">
+                        <p class="text-sm">No teams in Group ${activeGroup}</p>
+                    </div>`;
                 return;
             }
 
-            records.forEach((r, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-zinc-800/50 transition-colors';
-                tr.innerHTML = `
-                    <td class="p-4 text-white font-medium">${r.teamName}</td>
-                    <td class="p-4 text-center text-gray-300">${r.position}</td>
-                    <td class="p-4 text-center text-gray-300">${r.kills}</td>
-                    <td class="p-4 text-right">
-                        <button onclick="deleteRecord('${r.id}')" class="text-red-500 hover:text-red-400 uppercase text-xs font-bold px-2 py-1">Delete</button>
-                    </td>
+            teams.forEach((t, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-[#1e1e1e] border border-[#333] rounded-lg p-3 shadow-sm';
+                
+                // Header: Logo, Name, Delete
+                let matchesHtml = '';
+                for(let i=0; i<5; i++) {
+                    const m = t.matches[i] || {p:'', k:''};
+                    matchesHtml += `
+                        <div class="flex flex-col gap-1 items-center bg-zinc-900/50 p-1.5 rounded border border-white/5 shrink-0">
+                            <span class="text-[9px] text-zinc-400 font-bold uppercase">M${i+1}</span>
+                            <div class="flex gap-1.5">
+                                <input type="number" class="input-compact w-10 bg-black border-zinc-700 focus:border-orange-500 text-orange-500 font-bold" placeholder="#" 
+                                    value="${m.p || ''}" onchange="updateMatch('${t.id}', ${i}, 'p', this.value)">
+                                <input type="number" class="input-compact w-10 bg-zinc-800 border-zinc-700 focus:border-white text-white" placeholder="K" 
+                                    value="${m.k || ''}" onchange="updateMatch('${t.id}', ${i}, 'k', this.value)">
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-[#333]">
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-10 h-10 bg-black rounded flex items-center justify-center overflow-hidden border border-zinc-700">
+                                ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-contain">` : '<span class="text-lg">🛡️</span>'}
+                                <div class="absolute inset-0 opacity-0 hover:opacity-100 bg-black/60 flex items-center justify-center cursor-pointer">
+                                     <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateTeamLogo('${t.id}', this)">
+                                     <span class="text-[8px] text-white">Edit</span>
+                                </div>
+                            </div>
+                            <input type="text" value="${t.name}" class="bg-transparent text-white font-bold text-sm focus:border-b border-orange-500 outline-none w-32" onchange="updateTeamName('${t.id}', this.value)">
+                        </div>
+                        <button onclick="deleteTeam('${t.id}')" class="text-red-500 hover:text-red-400 text-xs font-medium bg-red-900/10 px-2 py-1 rounded">Delete</button>
+                    </div>
+                    
+                    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        ${matchesHtml}
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                list.appendChild(card);
             });
         }
+
+        // Shared helpers
+        const iconCalendar = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>`;
+        const iconClock = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>`;
+        
+        function getSponsorsHtml() {
+            if (styles.sponsorLogos && styles.sponsorLogos.length > 0) {
+                // Ensure full visibility (no grayscale, no opacity) for logos
+                // Adjusted height for better organization in footer
+                return styles.sponsorLogos.map(logo => `<img src="${logo}" class="h-9 w-auto object-contain drop-shadow-md" />`).join('');
+            }
+            return '';
+        }
+        
+        // --- RENDERERS ---
 
         function renderLeaderboard() {
             const teams = getAggregatedData(activeGroup);
@@ -315,221 +798,414 @@
             const top12 = displayData.slice(0, 12);
 
             const container = document.getElementById('capture-area');
-            
-            // Apply Container Styles
-            container.style.backgroundColor = styles.containerBg;
-            container.style.borderRadius = `${styles.tableRadius}px`;
-            container.style.padding = '20px';
-
-            const skewStyle = `transform: skew(${styles.skew}deg)`;
-            const counterSkewStyle = `transform: skew(${-styles.skew}deg)`;
-            const cellStyleCommon = `border-radius: ${styles.cellRadius}px; border: 2px solid transparent;`;
-
-            // Helper for cell HTML
-            const createCell = (bg, text, widthClass, content, isHeader = false) => `
-                <div style="${cellStyleCommon} background-color: ${bg}; color: ${text};" 
-                     class="${widthClass} py-${isHeader ? '2' : '1'} flex items-center justify-center ${isHeader ? 'font-black' : 'font-bold'} italic">
-                    <span style="${counterSkewStyle}" class="${!isHeader && widthClass === 'flex-1' ? 'truncate px-1' : ''}">${content}</span>
-                </div>
-            `;
+            container.style.width = '550px'; // Enforce fixed width
+            container.style.fontFamily = "'Orbitron', sans-serif";
+            container.style.backgroundColor = '#000';
+            // Added quotes for safety with base64 strings
+            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
+            container.style.borderRadius = `16px`;
+            container.style.padding = '30px 25px'; 
 
             let html = `
-                <!-- Header -->
-                <div class="w-full flex mb-2 gap-1.5 text-[10px] tracking-wider" style="${skewStyle}">
-                    ${createCell(styles.headerBg, styles.headerText, 'w-10', 'TOP', true)}
-                    ${createCell(styles.headerBg, styles.headerText, 'flex-1', 'TEAM NAME', true)}
-                    ${createCell(styles.headerBg, styles.headerText, 'w-16', 'BOOYAH', true)}
-                    ${createCell(styles.headerBg, styles.headerText, 'w-14', 'KILLS', true)}
-                    ${createCell(styles.headerBg, styles.headerText, 'w-14', 'POINTS', true)}
-                </div>
-                
-                <!-- Body -->
-                <div class="w-full flex flex-col gap-1.5 text-xs">
+                <div class="absolute inset-0 bg-black/80 z-0"></div>
+                <div class="relative z-10 w-full h-full flex flex-col items-center">
+                    
+                    ${styles.logoImage ? `
+                        <div class="mb-2 z-20">
+                            <img src="${styles.logoImage}" style="height: 50px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"/>
+                        </div>
+                    ` : ''}
+
+                    <h1 class="text-4xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center font-gamer">${styles.tournamentName}</h1>
+                    <h2 class="text-gold text-xs tracking-[0.4em] font-bold uppercase mb-0 text-center">OFFICIAL RESULTS</h2>
+                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-3 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-3"></div>'}
+
+                    <div class="flex gap-4 mb-6">
+                        <div class="flex items-center bg-zinc-900/90 border border-zinc-700/50 rounded px-4 py-1.5 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconCalendar} ${styles.tournamentDate}
+                        </div>
+                        <div class="flex items-center bg-zinc-900/90 border border-zinc-700/50 rounded px-4 py-1.5 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconClock} ${styles.tournamentTime}
+                        </div>
+                    </div>
+
+                    <!-- Table Header -->
+                    <div class="w-full flex px-4 mb-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                        <div class="w-12 text-left"></div> <!-- Rank space -->
+                        <div class="flex-1 text-left pl-2"></div> <!-- Name space -->
+                        <div class="w-10 text-center text-zinc-400">WIN</div>
+                        <div class="w-10 text-center text-zinc-400">KILLS</div>
+                        <div class="w-10 text-right text-gold">PTS</div>
+                    </div>
+
+                    <div class="w-full flex-1 min-h-0 flex flex-col justify-start gap-2 mb-2">
             `;
 
             top12.forEach((t, i) => {
+                const rank = i + 1;
+                let rowClass = "bg-zinc-900/40 border-l-4 border-transparent";
+                let rankTextClass = "text-zinc-600";
+                let ptsClass = "text-white";
+                let nameClass = "text-zinc-300";
+                
+                if (rank === 1) {
+                    rowClass = "bg-gradient-to-r from-orange-900/40 to-black/40 border-l-4 border-orange-500";
+                    rankTextClass = "text-orange-500 italic";
+                    ptsClass = "text-orange-500";
+                    nameClass = "text-white";
+                } else if (rank === 2) {
+                     rowClass = "bg-gradient-to-r from-slate-800/40 to-black/40 border-l-4 border-slate-400";
+                     rankTextClass = "text-slate-400 italic";
+                     ptsClass = "text-white";
+                     nameClass = "text-white";
+                } else if (rank === 3) {
+                     rowClass = "bg-gradient-to-r from-orange-900/20 to-black/40 border-l-4 border-orange-700";
+                     rankTextClass = "text-orange-700 italic";
+                     ptsClass = "text-orange-700";
+                     nameClass = "text-white";
+                } else {
+                     rowClass = "bg-zinc-900/30 border-l-4 border-zinc-800";
+                     rankTextClass = "text-zinc-500 italic";
+                     ptsClass = "text-white";
+                }
+                
+                // Logo check
+                const logoHtml = t.logo 
+                    ? `<img src="${t.logo}" class="w-5 h-5 object-contain mr-2">` 
+                    : '';
+
                 html += `
-                <div class="w-full flex gap-1.5" style="${skewStyle}">
-                    ${createCell(styles.rowBg, styles.rowText, 'w-10', i + 1)}
-                    ${createCell(styles.rowBg, styles.rowText, 'flex-1', t.name)}
-                    ${createCell(styles.rowBg, styles.rowText, 'w-16', t.booyah)}
-                    ${createCell(styles.rowBg, styles.rowText, 'w-14', t.kills)}
-                    ${createCell(styles.rowBg, styles.rowText, 'w-14', t.points)}
+                <div class="w-full flex items-center h-8 px-3 rounded ${rowClass} shrink-0">
+                    <div class="w-10 font-black text-lg text-left ${rankTextClass}">#${rank}</div>
+                    <div class="flex-1 flex items-center pl-1 truncate">
+                        ${logoHtml}
+                        <span class="font-bold uppercase tracking-wide text-[10px] truncate ${nameClass}">${t.name}</span>
+                    </div>
+                    <div class="w-10 text-center text-xs font-medium text-zinc-400">${t.booyah > 0 ? t.booyah : '-'}</div>
+                    <div class="w-10 text-center text-xs font-bold text-white">${t.kills}</div>
+                    <div class="w-10 text-right">
+                        <span class="font-black italic text-sm ${ptsClass}">
+                            ${t.points}
+                        </span>
+                    </div>
                 </div>
                 `;
             });
 
-            html += `</div>`;
+            html += `
+                    </div>
+                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
+                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
+                        
+                        <div class="flex items-center gap-2">
+                             ${getSponsorsHtml()}
+                        </div>
+
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
+                    </div>
+                </div>
+            `;
+            
             container.innerHTML = html;
         }
 
-        function renderStyleInputs() {
-            // Bind inputs to current style values
-            document.getElementById('containerBg').value = styles.containerBg;
-            document.getElementById('headerBg').value = styles.headerBg;
-            document.getElementById('headerText').value = styles.headerText;
-            document.getElementById('rowBg').value = styles.rowBg;
-            document.getElementById('rowText').value = styles.rowText;
-            
-            document.getElementById('tableRadius').value = styles.tableRadius;
-            document.getElementById('val-tableRadius').textContent = `(${styles.tableRadius}px)`;
-            
-            document.getElementById('cellRadius').value = styles.cellRadius;
-            document.getElementById('val-cellRadius').textContent = `(${styles.cellRadius}px)`;
-            
-            document.getElementById('skew').value = styles.skew;
-            document.getElementById('val-skew').textContent = `(${styles.skew}deg)`;
-        }
-
-        function renderNav() {
-            const navL = document.getElementById('nav-leaderboard');
-            const navE = document.getElementById('nav-editor');
-            const navS = document.getElementById('nav-style');
-
-            const activeClass = 'bg-orange-500 border-orange-500 text-black shadow-[0_0_15px_rgba(249,115,22,0.8)] scale-105';
-            const inactiveClass = 'bg-zinc-800 border-zinc-700 text-gray-300';
-            
-            // Reset base classes
-            [navL, navE, navS].forEach(btn => {
-                btn.className = `skew-btn w-full py-2 px-2 text-xs font-bold uppercase border-2 transition-all ${currentView === (btn === navL ? 'LEADERBOARD' : 'REGISTER') && btn !== navS ? activeClass : inactiveClass}`;
-            });
-            
-            // Handle Style Toggle State visual
-            if (isEditorOpen) {
-                 navS.className = `skew-btn w-full py-2 px-2 text-xs font-bold uppercase border-2 transition-all ${activeClass}`;
-            } else {
-                 navS.className = `skew-btn w-full py-2 px-2 text-xs font-bold uppercase border-2 transition-all ${inactiveClass}`;
+        function renderConfirmedTeamsBanner() {
+            // Just raw list, no sorting needed for confirmed usually, but let's keep array consistency
+            const teams = data[activeGroup] || [];
+            const displayData = [...teams];
+            while (displayData.length < 12) {
+                displayData.push({ name: '', logo: null });
             }
+            const top12 = displayData.slice(0, 12);
+
+            const container = document.getElementById('capture-area-confirmed');
+            container.style.width = '550px'; // Enforce fixed width
+            container.style.height = '550px'; // Enforce fixed height
+            container.style.fontFamily = "'Orbitron', sans-serif";
+            container.style.backgroundColor = '#000';
+            // Added quotes for safety
+            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
+            container.style.borderRadius = `16px`;
+            // Reduced bottom padding to 15px (from 30px) to lower the footer position
+            container.style.padding = '30px 25px 15px 25px';
+            
+            const shieldPath = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.67-.495-3.955a.75.75 0 00-.722-.515 11.208 11.208 0 01-7.877-3.08zM12 17.25a5.25 5.25 0 100-10.5 5.25 5.25 0 000 10.5z" clip-rule="evenodd" /></svg>`;
+            
+            let html = `
+                <div class="absolute inset-0 bg-black/60 z-0"></div>
+                <div class="relative z-10 w-full h-full flex flex-col items-center">
+                    
+                    ${styles.logoImage ? `
+                        <div class="mb-2 z-20">
+                            <img src="${styles.logoImage}" style="height: 45px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
+                        </div>
+                    ` : ''}
+
+                    <h1 class="text-3xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center">${styles.tournamentName}</h1>
+                    <h2 class="text-gold text-xs tracking-[0.4em] font-bold uppercase mb-0 text-center">CONFIRMED TEAMS</h2>
+                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-1 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-1"></div>'}
+
+                    <div class="flex gap-4 mb-2">
+                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconCalendar} ${styles.tournamentDate}
+                        </div>
+                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconClock} ${styles.tournamentTime}
+                        </div>
+                    </div>
+
+                    <!-- Grid: px-8. Grid padding logic maintained. -->
+                    <div class="grid grid-cols-4 gap-2 w-full flex-1 min-h-0 place-content-center mb-1 px-8">
+            `;
+            
+            top12.forEach((t, i) => {
+                const hasTeam = t.name && t.name !== '---' && t.name !== '';
+                
+                // Display specific logo if available, else SVG shield, else placeholder
+                let iconContent = shieldPath;
+                if (hasTeam && t.logo) {
+                    // Optimized size: w-24 h-24 (96px) - Maximize logo within the box without changing box size
+                    iconContent = `<img src="${t.logo}" class="w-full h-full object-contain drop-shadow-md" />`;
+                }
+
+                html += `
+                    <!-- Reduced padding from p-2 to p-1 to allow logo to grow closer to edges -->
+                    <div class="aspect-square relative bg-zinc-900/40 border border-zinc-800 rounded-lg flex flex-col items-center justify-center p-1 shadow-inner group overflow-hidden">
+                        <div class="absolute top-1.5 left-2 text-[8px] font-bold text-zinc-600 font-sans opacity-50">${i + 1}</div>
+                        
+                        <!-- Logo Container: Increased from w-20 (80px) to w-24 (96px) -->
+                        <div class="relative z-10 w-24 h-24 transition-transform group-hover:scale-105 duration-300 ${hasTeam && !t.logo ? 'text-gray-300' : 'text-zinc-800'}">
+                            ${iconContent}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    
+                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
+                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
+                        <div class="flex items-center gap-2">
+                             ${getSponsorsHtml()}
+                        </div>
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
         }
 
-        function renderAll() {
+        function renderTop3Banner() {
+            const teams = getAggregatedData(activeGroup);
+            const t1 = teams[0] || { name: 'TBD', kills: 0 };
+            const t2 = teams[1] || { name: 'TBD', kills: 0 };
+            const t3 = teams[2] || { name: 'TBD', kills: 0 };
+
+            const container = document.getElementById('capture-area-top3');
+            container.style.width = '550px'; // Enforce fixed width
+            container.style.height = '550px'; // Enforce fixed height
+            container.style.fontFamily = "'Orbitron', sans-serif";
+            container.style.backgroundColor = '#000';
+            // Added quotes for safety
+            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
+            container.style.borderRadius = `16px`;
+            container.style.padding = '30px 25px';
+
+            const shieldSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.67-.495-3.955a.75.75 0 00-.722-.515 11.208 11.208 0 01-7.877-3.08zM12 17.25a5.25 5.25 0 100-10.5 5.25 5.25 0 000 10.5z" clip-rule="evenodd" /></svg>`;
+            
+            // Helper to get image or svg
+            const getIcon = (t, colorClass) => {
+                if(t.name !== 'TBD' && t.logo) {
+                    return `<img src="${t.logo}" class="w-full h-full object-contain drop-shadow-md" />`;
+                }
+                return `<div class="${colorClass}">${shieldSvg}</div>`;
+            };
+
+            container.innerHTML = `
+                <div class="absolute inset-0 bg-black/60 z-0"></div>
+                
+                <div class="relative z-10 w-full h-full flex flex-col items-center">
+                    
+                     ${styles.logoImage ? `
+                        <div class="mb-2 z-20">
+                            <img src="${styles.logoImage}" style="height: 45px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"/>
+                        </div>
+                    ` : ''}
+
+                    <h1 class="text-3xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center">${styles.tournamentName}</h1>
+                    <h2 class="text-gold text-xs tracking-[0.5em] font-bold uppercase mb-0 text-center">TOP 3 TEAMS</h2>
+                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-6 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-6"></div>'}
+
+                     <div class="flex gap-4 mb-8">
+                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconCalendar} ${styles.tournamentDate}
+                        </div>
+                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
+                            ${iconClock} ${styles.tournamentTime}
+                        </div>
+                    </div>
+
+                    <!-- PODIUM -->
+                    <div class="w-full flex items-end justify-center gap-2 mb-4 flex-1 min-h-0 px-4">
+                        
+                        <!-- 2nd -->
+                        <div class="w-1/3 flex flex-col items-center justify-end">
+                             <div class="w-28 h-28 mb-[-18px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
+                                 ${getIcon(t2, 'text-zinc-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] w-full h-full')}
+                                 ${!t2.logo ? '<div class="absolute inset-0 flex items-center justify-center text-xl font-black text-black opacity-50">2</div>' : ''}
+                             </div>
+                             <div class="w-full bg-gradient-to-t from-zinc-800 to-zinc-900 border-t-2 border-zinc-500 h-24 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-lg">
+                                 <div class="text-[10px] font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 drop-shadow-md">${t2.name}</div>
+                                 <span class="text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Silver</span>
+                                 <span class="text-[10px] font-bold text-white bg-black/30 px-2 rounded mt-0.5 border border-white/5">${t2.kills} Kills</span>
+                             </div>
+                        </div>
+
+                        <!-- 1st -->
+                        <div class="w-1/3 flex flex-col items-center justify-end">
+                             <div class="w-40 h-40 mb-[-25px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
+                                 ${getIcon(t1, 'text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)] w-full h-full')}
+                                 ${!t1.logo ? '<div class="absolute inset-0 flex items-center justify-center text-3xl font-black text-black opacity-40">1</div>' : ''}
+                             </div>
+                             <div class="w-full bg-gradient-to-t from-yellow-900/60 to-yellow-600/20 border-t-2 border-yellow-400 h-32 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
+                                 <div class="text-xs font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 text-shadow-md">${t1.name}</div>
+                                 <span class="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mb-0.5">Champion</span>
+                                 <span class="text-xs font-bold text-white bg-black/30 px-2 py-0.5 rounded border border-white/10">${t1.kills} Kills</span>
+                             </div>
+                        </div>
+
+                        <!-- 3rd -->
+                        <div class="w-1/3 flex flex-col items-center justify-end">
+                             <div class="w-28 h-28 mb-[-18px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
+                                 ${getIcon(t3, 'text-orange-700 drop-shadow-[0_0_10px_rgba(194,65,12,0.3)] w-full h-full')}
+                                 ${!t3.logo ? '<div class="absolute inset-0 flex items-center justify-center text-xl font-black text-black opacity-50">3</div>' : ''}
+                             </div>
+                             <div class="w-full bg-gradient-to-t from-orange-900/40 to-orange-800/20 border-t-2 border-orange-600 h-20 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-lg">
+                                 <div class="text-[10px] font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 drop-shadow-md">${t3.name}</div>
+                                 <span class="text-[8px] text-orange-500 font-bold uppercase tracking-wider">Bronze</span>
+                                 <span class="text-[10px] font-bold text-white bg-black/30 px-2 rounded mt-0.5 border border-white/5">${t3.kills} Kills</span>
+                             </div>
+                        </div>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
+                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
+                        <div class="flex items-center gap-2">
+                             ${getSponsorsHtml()}
+                        </div>
+                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Initialization ---
+
+        window.onload = function() {
+            loadData();
             renderGroupButtons();
             
-            // View Switching
-            const regView = document.getElementById('view-register');
-            const leadView = document.getElementById('view-leaderboard');
-            
-            if (currentView === 'REGISTER') {
-                regView.classList.remove('hidden');
-                leadView.classList.add('hidden');
-                renderRegistration();
-            } else {
-                regView.classList.add('hidden');
-                leadView.classList.remove('hidden');
-                renderLeaderboard();
-            }
+            // Add Team Form Listener
+            document.getElementById('add-team-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('new-team-name');
+                const logoInput = document.getElementById('new-team-logo');
+                const name = nameInput.value.trim();
+                
+                if(name) {
+                    const newTeam = {
+                        id: Date.now().toString(),
+                        name: name,
+                        logo: null,
+                        matches: Array(5).fill(null).map(()=>({p:'', k:''}))
+                    };
 
-            // Editor Toggle
-            const editorDiv = document.getElementById('style-editor');
-            if (isEditorOpen) {
-                editorDiv.classList.remove('hidden');
-                renderStyleInputs();
-            } else {
-                editorDiv.classList.add('hidden');
-            }
-
-            renderNav();
-        }
-
-        // --- Actions ---
-
-        window.setView = (view) => {
-            currentView = view;
-            renderAll();
-        };
-
-        window.toggleEditor = () => {
-            isEditorOpen = !isEditorOpen;
-            renderAll();
-        };
-
-        window.resetStyles = () => {
-            styles = { ...DEFAULT_STYLES };
-            saveStyles();
-            renderAll();
-        };
-
-        window.deleteRecord = (id) => {
-            data[activeGroup] = data[activeGroup].filter(r => r.id !== id);
-            saveData();
-            renderRegistration(); // Only need to re-render the list
-        };
-
-        window.downloadImage = () => {
-            const element = document.getElementById("capture-area");
-            if (!element) return;
-            
-            html2canvas(element, {
-                backgroundColor: null,
-                scale: 3,
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement("a");
-                link.href = canvas.toDataURL("image/png");
-                link.download = `XT_UND_GROUP_${activeGroup}_Leaderboard.png`;
-                link.click();
-            }).catch(err => {
-                console.error("Download failed", err);
-                alert("Failed to generate image.");
+                    if(logoInput.files && logoInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            newTeam.logo = evt.target.result;
+                            if(!data[activeGroup]) data[activeGroup] = [];
+                            data[activeGroup].push(newTeam);
+                            saveData();
+                            renderTeamEditor();
+                            nameInput.value = '';
+                            logoInput.value = '';
+                        }
+                        reader.readAsDataURL(logoInput.files[0]);
+                    } else {
+                        if(!data[activeGroup]) data[activeGroup] = [];
+                        data[activeGroup].push(newTeam);
+                        saveData();
+                        renderTeamEditor();
+                        nameInput.value = '';
+                    }
+                }
             });
-        };
 
-        // --- Event Listeners for Form & Style Editor ---
-        
-        document.getElementById('add-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('input-name').value;
-            const pos = parseInt(document.getElementById('input-pos').value);
-            const kills = parseInt(document.getElementById('input-kills').value);
-
-            if (name && pos && !isNaN(kills)) {
-                const newRecord = {
-                    id: Date.now().toString(),
-                    teamName: name,
-                    position: pos,
-                    kills: kills
-                };
-                if (!data[activeGroup]) data[activeGroup] = [];
-                data[activeGroup].push(newRecord);
-                saveData();
-                
-                // Reset inputs
-                document.getElementById('input-name').value = '';
-                document.getElementById('input-pos').value = '';
-                document.getElementById('input-kills').value = '';
-                
-                renderRegistration();
-                alert('Added!');
-            }
-        });
-
-        // Style Input Listeners
-        const styleInputs = [
-            'containerBg', 'headerBg', 'headerText', 'rowBg', 'rowText', 
-            'tableRadius', 'cellRadius', 'skew'
-        ];
-        
-        styleInputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', (e) => {
-                let val = e.target.value;
-                if (e.target.type === 'range') val = parseInt(val);
-                styles[id] = val;
-                
-                // Update text indicators
-                if (id === 'tableRadius') document.getElementById('val-tableRadius').textContent = `(${val}px)`;
-                if (id === 'cellRadius') document.getElementById('val-cellRadius').textContent = `(${val}px)`;
-                if (id === 'skew') document.getElementById('val-skew').textContent = `(${val}deg)`;
-
-                saveStyles();
-                if (currentView === 'LEADERBOARD') renderLeaderboard();
+            // Settings Inputs Listeners
+            ['tournamentName', 'tournamentDate', 'tournamentTime', 'footerTextLeft', 'footerTextRight'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.addEventListener('input', (e) => {
+                        styles[id] = e.target.value;
+                        saveStyles();
+                        renderAll();
+                    });
+                }
             });
-        });
 
-        // --- Init ---
-        loadData();
-        renderAll();
+            // Image Upload Listeners
+            document.getElementById('logoImage').addEventListener('change', (e) => handleImageUpload(e, 'logoImage'));
+            document.getElementById('backgroundImage').addEventListener('change', (e) => handleImageUpload(e, 'backgroundImage'));
+            
+            // Sponsor add
+            document.getElementById('addSponsorInput').addEventListener('change', (e) => {
+                if(e.target.files && e.target.files[0]){
+                    const reader = new FileReader();
+                    reader.onload = function(evt){
+                        if(!styles.sponsorLogos) styles.sponsorLogos = [];
+                        styles.sponsorLogos.push(evt.target.result);
+                        saveStyles();
+                        renderSponsorListInSettings();
+                        renderAll();
+                        e.target.value = ''; // clear
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
 
+            // Initial Render
+            setView('LEADERBOARD');
+            
+            // Set previews if exist
+            if(styles.logoImage) {
+                 const container = document.getElementById('preview-logo-container');
+                 const input = container.querySelector('input');
+                 const img = document.createElement('img');
+                 img.src = styles.logoImage;
+                 img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
+                 container.innerHTML = '';
+                 container.appendChild(img);
+                 container.appendChild(input);
+                 // Re-attach because innerHTML wiped it
+                 input.addEventListener('change', (e) => handleImageUpload(e, 'logoImage'));
+            }
+            if(styles.backgroundImage) {
+                 const container = document.getElementById('preview-bg-container');
+                 const input = container.querySelector('input');
+                 const img = document.createElement('img');
+                 img.src = styles.backgroundImage;
+                 img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
+                 container.innerHTML = '';
+                 container.appendChild(img);
+                 container.appendChild(input);
+                 input.addEventListener('change', (e) => handleImageUpload(e, 'backgroundImage'));
+            }
+        };
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
