@@ -116,12 +116,12 @@
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-900/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                     </svg>
                 </div>
                 <h1 class="text-lg font-bold text-white tracking-wide font-gamer"><span id="app-header-title">XT UND</span> <span class="text-orange-500 text-xs font-normal align-middle ml-1">MANAGER</span></h1>
             </div>
-            <div class="text-xs text-gray-500 font-medium">v5.4 Spacious</div>
+            <div class="text-xs text-gray-500 font-medium">v6.0 Storage+</div>
         </div>
         
         <!-- Group Selector (Horizontal Scroll) -->
@@ -329,7 +329,7 @@
             
             <button onclick="setView('LEADERBOARD')" id="nav-leaderboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                 </svg>
                 <span class="text-[10px] font-medium">Results</span>
             </button>
@@ -374,40 +374,121 @@
         };
         let styles = { ...DEFAULT_STYLES };
 
-        // --- Persistence ---
-        function loadData() {
-            try {
-                const storedData = localStorage.getItem('xt_und_data_v2');
-                if (storedData) {
-                    data = JSON.parse(storedData);
-                    if(!data.ESPECIAL) data.ESPECIAL = [];
-                }
-                const storedStyles = localStorage.getItem('xt_und_styles_v3'); 
-                if (storedStyles) {
-                    const parsed = JSON.parse(storedStyles);
-                    if (parsed.sponsorLogo && (!parsed.sponsorLogos || parsed.sponsorLogos.length === 0)) {
-                        parsed.sponsorLogos = [parsed.sponsorLogo];
+        // --- Persistence (IndexedDB + LocalStorage Hybrid) ---
+        
+        // IndexedDB Configuration
+        const DB_NAME = 'XT_UND_DB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'app_data';
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
                     }
-                    styles = { ...DEFAULT_STYLES, ...parsed };
-                }
-                const storedGroup = localStorage.getItem('xt_und_active_group');
-                if (storedGroup && GROUPS.includes(storedGroup)) activeGroup = storedGroup;
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function dbSet(key, value) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const request = store.put(value, key);
+                    request.onsuccess = () => resolve();
+                    request.onerror = (e) => reject(e.target.error);
+                });
             } catch (e) {
-                console.error("Error loading data", e);
+                console.error("DB Save Error:", e);
             }
         }
 
-        function saveData() {
+        async function dbGet(key) {
             try {
-                localStorage.setItem('xt_und_data_v2', JSON.stringify(data));
-                localStorage.setItem('xt_und_active_group', activeGroup);
-            } catch (e) { console.error(e); }
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const request = store.get(key);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            } catch (e) {
+                console.error("DB Load Error:", e);
+                return null;
+            }
         }
 
-        function saveStyles() {
+        async function loadData() {
             try {
-                localStorage.setItem('xt_und_styles_v3', JSON.stringify(styles));
-            } catch (e) { console.error(e); }
+                // 1. Try IndexedDB first
+                let storedData = await dbGet('xt_und_data_v2');
+                let storedStyles = await dbGet('xt_und_styles_v3');
+
+                // 2. Migration: Check LocalStorage if IDB is empty
+                if (!storedData) {
+                    const lsData = localStorage.getItem('xt_und_data_v2');
+                    if (lsData) {
+                        console.log("Migrating Data to IndexedDB...");
+                        storedData = JSON.parse(lsData);
+                        await dbSet('xt_und_data_v2', storedData);
+                        // Optional: Clear old LS to free space
+                        // localStorage.removeItem('xt_und_data_v2');
+                    }
+                }
+                
+                if (!storedStyles) {
+                    const lsStyles = localStorage.getItem('xt_und_styles_v3');
+                    if (lsStyles) {
+                        console.log("Migrating Styles to IndexedDB...");
+                        storedStyles = JSON.parse(lsStyles);
+                        await dbSet('xt_und_styles_v3', storedStyles);
+                    }
+                }
+
+                // 3. Apply Data
+                if (storedData) {
+                    data = storedData;
+                    if(!data.ESPECIAL) data.ESPECIAL = [];
+                }
+
+                if (storedStyles) {
+                    styles = { ...DEFAULT_STYLES, ...storedStyles };
+                    if (styles.sponsorLogo && (!styles.sponsorLogos || styles.sponsorLogos.length === 0)) {
+                        styles.sponsorLogos = [styles.sponsorLogo];
+                    }
+                }
+
+                // Active group is small, keep using LS or default
+                const storedGroup = localStorage.getItem('xt_und_active_group');
+                if (storedGroup && GROUPS.includes(storedGroup)) activeGroup = storedGroup;
+
+            } catch (e) {
+                console.error("Error loading data", e);
+                alert("Error loading data from storage. Please check console.");
+            }
+        }
+
+        async function saveData() {
+            try {
+                // Save heavy data to IDB
+                await dbSet('xt_und_data_v2', data);
+                // Save lightweight state to LS
+                localStorage.setItem('xt_und_active_group', activeGroup);
+            } catch (e) { console.error("Save Data Error:", e); }
+        }
+
+        async function saveStyles() {
+            try {
+                await dbSet('xt_und_styles_v3', styles);
+            } catch (e) { console.error("Save Styles Error:", e); }
         }
 
         // --- Logic ---
@@ -1177,8 +1258,6 @@
         
         // Initial setup
         window.onload = function() {
-            loadData();
-            
             // Add Team
             document.getElementById('add-team-form').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1215,11 +1294,13 @@
                     r.readAsDataURL(e.target.files[0]);
                  }
             });
-            
-            // Initial
-            setView('LEADERBOARD');
-            renderGroupButtons();
-            renderSponsorListInSettings();
+
+            // Load Data & Init
+            loadData().then(() => {
+                setView('LEADERBOARD');
+                renderGroupButtons();
+                renderSponsorListInSettings();
+            });
         };
 
     </script>
