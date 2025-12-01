@@ -6,7 +6,7 @@
     <title>XT UND Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html2canvas removed - using native Canvas API -->
     <style>
       /* Base Settings */
       body {
@@ -116,12 +116,12 @@
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-900/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                     </svg>
                 </div>
                 <h1 class="text-lg font-bold text-white tracking-wide font-gamer"><span id="app-header-title">XT UND</span> <span class="text-orange-500 text-xs font-normal align-middle ml-1">MANAGER</span></h1>
             </div>
-            <div class="text-xs text-gray-500 font-medium">v4.2</div>
+            <div class="text-xs text-gray-500 font-medium">v5.4 Spacious</div>
         </div>
         
         <!-- Group Selector (Horizontal Scroll) -->
@@ -140,45 +140,45 @@
              <!-- Action Bar -->
              <div class="w-full flex justify-between items-center mb-4">
                  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Results Board</h2>
-                 <button onclick="downloadImage('capture-area')" class="bg-orange-600 active:bg-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-orange-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                 <button onclick="downloadCanvas('results')" class="bg-orange-600 active:bg-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-orange-900/30 flex items-center gap-2 transition-transform active:scale-95">
                     <span>💾 SAVE BOARD</span>
                 </button>
              </div>
 
              <!-- Capture Area: Leaderboard -->
              <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-10 border border-zinc-800">
-                 <div id="capture-area" class="min-w-[550px] w-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center overflow-hidden shrink-0">
-                     <!-- Content injected by JS -->
+                 <div id="preview-results" class="min-w-[550px] w-[550px] mx-auto bg-black flex justify-center">
+                    <!-- Canvas injected here -->
                  </div>
              </div>
 
              <!-- Action Bar Top 3 -->
              <div class="w-full flex justify-between items-center mb-4 border-t border-zinc-800 pt-6">
                 <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Top 3 Banner</h2>
-                <button onclick="downloadImage('capture-area-top3')" class="bg-yellow-500 active:bg-yellow-600 text-black px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-yellow-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                <button onclick="downloadCanvas('top3')" class="bg-yellow-500 active:bg-yellow-600 text-black px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-yellow-900/30 flex items-center gap-2 transition-transform active:scale-95">
                    <span>💾 SAVE TOP 3</span>
                </button>
             </div>
 
              <!-- Capture Area: Top 3 Banner -->
              <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-10 border border-zinc-800">
-                <div id="capture-area-top3" class="min-w-[550px] w-[550px] h-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center justify-between overflow-hidden shrink-0">
-                    <!-- Content injected by JS -->
+                <div id="preview-top3" class="min-w-[550px] w-[550px] mx-auto bg-black flex justify-center">
+                    <!-- Canvas injected here -->
                 </div>
             </div>
 
             <!-- Action Bar Confirmed Teams -->
             <div class="w-full flex justify-between items-center mb-4 border-t border-zinc-800 pt-6">
                 <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Confirmed Teams</h2>
-                <button onclick="downloadImage('capture-area-confirmed')" class="bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-blue-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                <button onclick="downloadCanvas('confirmed')" class="bg-blue-600 active:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-blue-900/30 flex items-center gap-2 transition-transform active:scale-95">
                    <span>💾 SAVE TEAMS</span>
                </button>
             </div>
 
              <!-- Capture Area: Confirmed Teams -->
              <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-8 border border-zinc-800">
-                <div id="capture-area-confirmed" class="min-w-[550px] w-[550px] h-[550px] mx-auto bg-cover bg-center bg-no-repeat text-white relative flex flex-col items-center justify-between overflow-hidden shrink-0">
-                    <!-- Content injected by JS -->
+                <div id="preview-confirmed" class="min-w-[550px] w-[550px] mx-auto bg-black flex justify-center">
+                    <!-- Canvas injected here -->
                 </div>
             </div>
         </div>
@@ -329,7 +329,7 @@
             
             <button onclick="setView('LEADERBOARD')" id="nav-leaderboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                 </svg>
                 <span class="text-[10px] font-medium">Results</span>
             </button>
@@ -358,7 +358,7 @@
         let activeGroup = 'A';
         let currentView = 'LEADERBOARD'; 
         
-        // Data Structure V2: { [Group]: [ { id, name, logo, matches: [ {p, k}, ... ] } ] }
+        // Data Structure
         let data = { A: [], B: [], C: [], D: [], E: [], F: [], ESPECIAL: [], FINALS: [] };
         
         const DEFAULT_STYLES = {
@@ -377,14 +377,11 @@
         // --- Persistence ---
         function loadData() {
             try {
-                // v2 Data Structure
                 const storedData = localStorage.getItem('xt_und_data_v2');
                 if (storedData) {
                     data = JSON.parse(storedData);
-                    // Ensure new keys exist if loading old data
                     if(!data.ESPECIAL) data.ESPECIAL = [];
                 }
-                
                 const storedStyles = localStorage.getItem('xt_und_styles_v3'); 
                 if (storedStyles) {
                     const parsed = JSON.parse(storedStyles);
@@ -393,7 +390,6 @@
                     }
                     styles = { ...DEFAULT_STYLES, ...parsed };
                 }
-
                 const storedGroup = localStorage.getItem('xt_und_active_group');
                 if (storedGroup && GROUPS.includes(storedGroup)) activeGroup = storedGroup;
             } catch (e) {
@@ -405,19 +401,13 @@
             try {
                 localStorage.setItem('xt_und_data_v2', JSON.stringify(data));
                 localStorage.setItem('xt_und_active_group', activeGroup);
-            } catch (e) {
-                console.error(e);
-                alert("Storage Warning: LocalStorage full.");
-            }
+            } catch (e) { console.error(e); }
         }
 
         function saveStyles() {
             try {
                 localStorage.setItem('xt_und_styles_v3', JSON.stringify(styles));
-            } catch (e) {
-                console.error(e);
-                alert("Storage Full: Images too large.");
-            }
+            } catch (e) { console.error(e); }
         }
 
         // --- Logic ---
@@ -426,7 +416,6 @@
             let pts = 0;
             const p = parseInt(pos);
             const k = parseInt(kills) || 0;
-
             if (p === 1) pts = 12;
             else if (p === 2) pts = 9;
             else if (p === 3) pts = 8;
@@ -437,18 +426,15 @@
             else if (p === 8) pts = 3;
             else if (p === 9) pts = 2;
             else if (p === 10) pts = 1;
-            
             return pts + k;
         }
 
         function getAggregatedData(group) {
             const teams = data[group] || [];
-            
             const processed = teams.map(t => {
                 let totalPoints = 0;
                 let totalKills = 0;
                 let booyahs = 0;
-
                 t.matches.forEach(m => {
                     const k = parseInt(m.k) || 0;
                     const p = parseInt(m.p);
@@ -456,15 +442,8 @@
                     totalKills += k;
                     totalPoints += calculateMatchPoints(m.p, m.k);
                 });
-
-                return {
-                    ...t,
-                    points: totalPoints,
-                    kills: totalKills,
-                    booyah: booyahs
-                };
+                return { ...t, points: totalPoints, kills: totalKills, booyah: booyahs };
             });
-
             return processed.sort((a, b) => {
                 if(b.points !== a.points) return b.points - a.points;
                 return b.kills - a.kills;
@@ -474,8 +453,6 @@
         // --- Navigation ---
         function setView(view) {
             currentView = view;
-            
-            // Toggle visibility
             document.getElementById('view-leaderboard').classList.add('hidden');
             document.getElementById('view-register').classList.add('hidden');
             document.getElementById('view-style').classList.add('hidden');
@@ -490,7 +467,6 @@
                 renderTeamEditor();
             } else if (view === 'STYLE') {
                 document.getElementById('view-style').classList.remove('hidden');
-                // Sync inputs
                 document.getElementById('tournamentName').value = styles.tournamentName || '';
                 document.getElementById('tournamentDate').value = styles.tournamentDate || '';
                 document.getElementById('tournamentTime').value = styles.tournamentTime || '';
@@ -498,21 +474,80 @@
                 document.getElementById('footerTextRight').value = styles.footerTextRight || '';
                 renderSponsorListInSettings();
             }
-
-            // Update Nav Icons
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('text-orange-500'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-gray-500'));
-            
             if(view === 'LEADERBOARD') document.getElementById('nav-leaderboard').classList.add('text-orange-500');
             if(view === 'REGISTER') document.getElementById('nav-editor').classList.add('text-orange-500');
             if(view === 'STYLE') document.getElementById('nav-style').classList.add('text-orange-500');
         }
+        
+        // --- Render Helpers ---
+        function renderGroupButtons() {
+            const container = document.getElementById('group-selector');
+            container.innerHTML = '';
+            
+            GROUPS.forEach(g => {
+                const btn = document.createElement('button');
+                const isActive = g === activeGroup;
+                btn.className = `whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    isActive 
+                    ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/40' 
+                    : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white'
+                }`;
+                btn.textContent = g === 'ESPECIAL' ? 'ESPECIAL' : (g.length > 2 ? g : `GROUP ${g}`);
+                btn.onclick = () => {
+                    activeGroup = g;
+                    saveData();
+                    renderGroupButtons();
+                    renderAll(); 
+                    if(currentView === 'REGISTER') renderTeamEditor(); 
+                };
+                container.appendChild(btn);
+            });
+        }
+        
+        function renderTeamEditor() {
+            const container = document.getElementById('teams-list');
+            const title = document.getElementById('reg-group-title');
+            if(title) title.textContent = activeGroup;
+            
+            container.innerHTML = '';
+            const teams = data[activeGroup] || [];
 
-        function renderAll() {
-            renderLeaderboard();
-            renderTop3Banner();
-            renderConfirmedTeamsBanner();
-            document.getElementById('app-header-title').textContent = styles.tournamentName || 'XT UND';
+            teams.forEach(team => {
+                const div = document.createElement('div');
+                div.className = 'card bg-[#1e1e1e] border border-[#333] p-3 rounded-lg animate-fade-in mb-3';
+                
+                // Header: Logo, Name, Delete
+                let logoHtml = `<div class="w-10 h-10 bg-black rounded flex items-center justify-center border border-gray-700 text-xs text-gray-500 overflow-hidden relative group cursor-pointer">
+                    ${team.logo ? `<img src="${team.logo}" class="w-full h-full object-cover">` : '🛡️'}
+                    <input type="file" onchange="updateTeamLogo('${team.id}', this)" class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>`;
+
+                let matchesHtml = '';
+                for(let i=0; i<5; i++) {
+                     const m = team.matches[i] || {p:'', k:''};
+                     matchesHtml += `
+                        <div class="bg-black/50 p-1 rounded border border-gray-800 flex flex-col gap-1 w-[45px]">
+                            <span class="text-[8px] text-gray-500 text-center">M${i+1}</span>
+                            <input type="number" value="${m.p}" onchange="updateMatch('${team.id}', ${i}, 'p', this.value)" class="input-compact text-orange-400 font-bold border-orange-900/30" placeholder="#">
+                            <input type="number" value="${m.k}" onchange="updateMatch('${team.id}', ${i}, 'k', this.value)" class="input-compact bg-zinc-900" placeholder="K">
+                        </div>
+                     `;
+                }
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 mb-3">
+                        ${logoHtml}
+                        <input type="text" value="${team.name}" onchange="updateTeamName('${team.id}', this.value)" class="input-modern flex-1" placeholder="Team Name">
+                        <button onclick="deleteTeam('${team.id}')" class="text-red-500 text-xs hover:bg-red-900/20 p-2 rounded">Delete</button>
+                    </div>
+                    <div class="flex gap-1 overflow-x-auto pb-1 no-scrollbar">
+                        ${matchesHtml}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         // --- Actions ---
@@ -528,10 +563,7 @@
 
         function updateTeamName(id, value) {
             const team = data[activeGroup].find(t => t.id === id);
-            if(team) {
-                team.name = value;
-                saveData();
-            }
+            if(team) { team.name = value; saveData(); }
         }
 
         function updateTeamLogo(id, input) {
@@ -539,11 +571,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const team = data[activeGroup].find(t => t.id === id);
-                    if(team) {
-                        team.logo = e.target.result;
-                        saveData();
-                        renderTeamEditor(); 
-                    }
+                    if(team) { team.logo = e.target.result; saveData(); renderTeamEditor(); }
                 }
                 reader.readAsDataURL(input.files[0]);
             }
@@ -558,79 +586,26 @@
         }
 
         function resetStyles() {
-            if(confirm('Reset all styles?')) {
-                styles = { ...DEFAULT_STYLES };
-                saveStyles();
-                setView('STYLE');
-                renderAll();
-            }
+            if(confirm('Reset all styles?')) { styles = { ...DEFAULT_STYLES }; saveStyles(); setView('STYLE'); renderAll(); }
         }
 
         function resetData() {
-            if(confirm(`Clear all data for Group ${activeGroup}?`)) {
-                data[activeGroup] = [];
-                saveData();
-                renderTeamEditor();
-                renderAll();
-            }
-        }
-
-        function downloadImage(elementId) {
-            const element = document.getElementById(elementId);
-            
-            // Fix for shifting content during capture:
-            // Explicitly force width/height and reset scroll positions in options
-            const options = {
-                scale: 3, // High resolution
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null, // Keep existing background
-                width: 550, // Fixed width based on our CSS
-                height: element.scrollHeight, // Full height
-                scrollX: 0,
-                scrollY: 0,
-                onclone: (clonedDoc) => {
-                    // Ensure the cloned element is perfectly aligned and ignores external margins
-                    const clonedElement = clonedDoc.getElementById(elementId);
-                    if(clonedElement) {
-                        clonedElement.style.margin = '0';
-                        clonedElement.style.transform = 'none';
-                        // Force fixed dimensions again on style to be sure
-                        clonedElement.style.width = '550px';
-                        clonedElement.style.height = elementId !== 'capture-area' ? '550px' : 'auto';
-                    }
-                }
-            };
-
-            html2canvas(element, options).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${(styles.tournamentName || 'XT_UND').replace(/\s+/g,'_')}_${elementId}_${activeGroup}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
+            if(confirm(`Clear all data for Group ${activeGroup}?`)) { data[activeGroup] = []; saveData(); renderTeamEditor(); renderAll(); }
         }
 
         function clearImage(key) {
             styles[key] = null;
             saveStyles();
-            
-            // Reset preview
             if(key === 'logoImage') {
                  const container = document.getElementById('preview-logo-container');
                  const input = container.querySelector('input');
-                 container.innerHTML = `
-                    <span class="text-2xl mb-1 z-0">🛡️</span>
-                    <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
-                 `;
+                 container.innerHTML = `<span class="text-2xl mb-1 z-0">🛡️</span><span class="text-[10px] text-gray-400 z-0">Tap to upload</span>`;
                  container.appendChild(input);
             }
             if(key === 'backgroundImage') {
                  const container = document.getElementById('preview-bg-container');
                  const input = container.querySelector('input');
-                 container.innerHTML = `
-                    <span class="text-2xl mb-1 z-0">🖼️</span>
-                    <span class="text-[10px] text-gray-400 z-0">Tap to upload</span>
-                 `;
+                 container.innerHTML = `<span class="text-2xl mb-1 z-0">🖼️</span><span class="text-[10px] text-gray-400 z-0">Tap to upload</span>`;
                  container.appendChild(input);
             }
             renderAll();
@@ -644,16 +619,12 @@
                     styles[key] = evt.target.result;
                     saveStyles();
                     renderAll();
-                    
-                    // Show Preview
                     const containerId = key === 'logoImage' ? 'preview-logo-container' : 'preview-bg-container';
                     const container = document.getElementById(containerId);
                     const input = container.querySelector('input');
-                    
                     const img = document.createElement('img');
                     img.src = evt.target.result;
                     img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
-                    
                     container.innerHTML = '';
                     container.appendChild(img);
                     container.appendChild(input);
@@ -668,10 +639,7 @@
             (styles.sponsorLogos || []).forEach((logo, idx) => {
                 const div = document.createElement('div');
                 div.className = 'relative w-10 h-10 border border-zinc-700 rounded bg-black flex items-center justify-center';
-                div.innerHTML = `
-                    <img src="${logo}" class="max-w-full max-h-full object-contain">
-                    <button onclick="removeSponsor(${idx})" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px]">&times;</button>
-                `;
+                div.innerHTML = `<img src="${logo}" class="max-w-full max-h-full object-contain"><button onclick="removeSponsor(${idx})" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px]">&times;</button>`;
                 container.appendChild(div);
             });
         }
@@ -682,530 +650,578 @@
             renderSponsorListInSettings();
             renderAll();
         }
+        
+        // ==========================================
+        // CANVAS RENDERING ENGINE (No external libs)
+        // ==========================================
 
-        // --- UI Rendering ---
+        const CANVAS_WIDTH = 550;
+        // Fonts
+        const FONT_GAMER = "900 italic 32px Orbitron, sans-serif";
+        const FONT_GAMER_SM = "700 italic 24px Orbitron, sans-serif";
+        const FONT_SUBTITLE = "700 12px Orbitron, sans-serif";
+        const FONT_NORMAL = "400 12px Inter, sans-serif";
+        const FONT_BOLD = "700 12px Inter, sans-serif";
 
-        function renderGroupButtons() {
-            const container = document.getElementById('group-selector');
-            container.innerHTML = '';
-            GROUPS.forEach(g => {
-                const isActive = activeGroup === g;
-                const btn = document.createElement('button');
-                btn.className = `whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    isActive 
-                    ? 'bg-orange-600 text-white shadow-md shadow-orange-900/40' 
-                    : 'bg-[#2a2a2a] text-gray-400 border border-[#333]'
-                }`;
-                // Special naming for ESPECIAL and FINALS
-                let btnText = `GR ${g}`;
-                if (g === 'FINALS') btnText = 'FINALS';
-                if (g === 'ESPECIAL') btnText = 'ESPECIAL';
-                
-                btn.textContent = btnText;
-                btn.onclick = () => { 
-                    activeGroup = g; 
-                    saveData(); 
-                    renderAll(); 
-                    if(currentView === 'REGISTER') renderTeamEditor();
-                };
-                container.appendChild(btn);
+        async function loadImage(src) {
+            return new Promise((resolve) => {
+                if(!src) resolve(null);
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = src;
             });
-            setTimeout(() => {
-                 const activeBtn = container.querySelector('.bg-orange-600');
-                 if(activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }, 50);
         }
 
-        function renderTeamEditor() {
-            document.getElementById('reg-group-title').textContent = activeGroup;
-            const list = document.getElementById('teams-list');
-            list.innerHTML = '';
+        function drawRoundedRect(ctx, x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // --- Draw Header (Logo, Title, Group, Date/Time) ---
+        async function drawHeader(ctx, title, group, date, time, bgImage, logoImage) {
+            // Background
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, CANVAS_WIDTH, ctx.canvas.height);
             
-            const teams = data[activeGroup] || [];
-            if (teams.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-10 text-gray-600">
-                        <p class="text-sm">No teams in Group ${activeGroup}</p>
-                    </div>`;
-                return;
-            }
-
-            teams.forEach((t, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-[#1e1e1e] border border-[#333] rounded-lg p-3 shadow-sm';
-                
-                // Header: Logo, Name, Delete
-                let matchesHtml = '';
-                for(let i=0; i<5; i++) {
-                    const m = t.matches[i] || {p:'', k:''};
-                    matchesHtml += `
-                        <div class="flex flex-col gap-1 items-center bg-zinc-900/50 p-1.5 rounded border border-white/5 shrink-0">
-                            <span class="text-[9px] text-zinc-400 font-bold uppercase">M${i+1}</span>
-                            <div class="flex gap-1.5">
-                                <input type="number" class="input-compact w-10 bg-black border-zinc-700 focus:border-orange-500 text-orange-500 font-bold" placeholder="#" 
-                                    value="${m.p || ''}" onchange="updateMatch('${t.id}', ${i}, 'p', this.value)">
-                                <input type="number" class="input-compact w-10 bg-zinc-800 border-zinc-700 focus:border-white text-white" placeholder="K" 
-                                    value="${m.k || ''}" onchange="updateMatch('${t.id}', ${i}, 'k', this.value)">
-                            </div>
-                        </div>
-                    `;
+            if (bgImage) {
+                // Draw BG centered cover
+                const aspect = bgImage.width / bgImage.height;
+                let dh = CANVAS_WIDTH / aspect;
+                // If image is too short for canvas, scale by height
+                if(dh < ctx.canvas.height) {
+                    dh = ctx.canvas.height;
+                    const dw = dh * aspect;
+                     ctx.drawImage(bgImage, (CANVAS_WIDTH - dw)/2, 0, dw, dh);
+                } else {
+                     ctx.drawImage(bgImage, 0, (ctx.canvas.height - dh)/2, CANVAS_WIDTH, dh);
                 }
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-[#333]">
-                        <div class="flex items-center gap-3">
-                            <div class="relative w-10 h-10 bg-black rounded flex items-center justify-center overflow-hidden border border-zinc-700">
-                                ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-contain">` : '<span class="text-lg">🛡️</span>'}
-                                <div class="absolute inset-0 opacity-0 hover:opacity-100 bg-black/60 flex items-center justify-center cursor-pointer">
-                                     <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateTeamLogo('${t.id}', this)">
-                                     <span class="text-[8px] text-white">Edit</span>
-                                </div>
-                            </div>
-                            <input type="text" value="${t.name}" class="bg-transparent text-white font-bold text-sm focus:border-b border-orange-500 outline-none w-32" onchange="updateTeamName('${t.id}', this.value)">
-                        </div>
-                        <button onclick="deleteTeam('${t.id}')" class="text-red-500 hover:text-red-400 text-xs font-medium bg-red-900/10 px-2 py-1 rounded">Delete</button>
-                    </div>
-                    
-                    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                        ${matchesHtml}
-                    </div>
-                `;
-                list.appendChild(card);
-            });
-        }
-
-        // Shared helpers
-        const iconCalendar = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>`;
-        const iconClock = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>`;
-        
-        function getSponsorsHtml() {
-            if (styles.sponsorLogos && styles.sponsorLogos.length > 0) {
-                // Ensure full visibility (no grayscale, no opacity) for logos
-                // Adjusted height for better organization in footer
-                return styles.sponsorLogos.map(logo => `<img src="${logo}" class="h-9 w-auto object-contain drop-shadow-md" />`).join('');
+                // Overlay
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(0,0, CANVAS_WIDTH, ctx.canvas.height);
             }
-            return '';
-        }
-        
-        // --- RENDERERS ---
 
-        function renderLeaderboard() {
+            let currentY = 30; // Increased spacing
+
+            // Tournament Logo
+            if (logoImage) {
+                const logoH = 45;
+                const logoW = logoImage.width * (logoH / logoImage.height);
+                ctx.drawImage(logoImage, (CANVAS_WIDTH - logoW) / 2, currentY, logoW, logoH);
+                currentY += 60; // Increased gap
+            } else {
+                currentY += 20;
+            }
+
+            // Tournament Title
+            ctx.font = FONT_GAMER;
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 10;
+            ctx.fillText(title.toUpperCase(), CANVAS_WIDTH / 2, currentY + 10);
+            ctx.shadowBlur = 0;
+            currentY += 30; // Increased gap
+
+            // Subtitle
+            ctx.font = FONT_SUBTITLE;
+            ctx.fillStyle = "#fbbf24"; // Gold
+            ctx.letterSpacing = "4px"; 
+            let subtitle = "OFFICIAL RESULTS";
+            if(ctx.canvas.id.includes("top3")) subtitle = "TOP 3 TEAMS";
+            if(ctx.canvas.id.includes("confirmed")) subtitle = "CONFIRMED TEAMS";
+            
+            ctx.fillText(subtitle, CANVAS_WIDTH / 2, currentY);
+            currentY += 20; // Increased gap
+
+            // Group
+            ctx.font = "bold 10px Orbitron";
+            ctx.fillStyle = "#a1a1aa";
+            ctx.letterSpacing = "2px";
+            
+            const groupText = group === 'ESPECIAL' ? 'ESPECIAL' : `GROUP ${group}`;
+            ctx.fillText(groupText, CANVAS_WIDTH / 2, currentY);
+            currentY += 20; // Increased gap
+
+            // Date / Time Pills
+            const pillW = 100;
+            const pillH = 24;
+            const gap = 15;
+            const startX = (CANVAS_WIDTH - (pillW * 2 + gap)) / 2;
+            
+            ctx.font = "bold 10px Inter";
+            
+            // Date Pill
+            ctx.fillStyle = "rgba(24, 24, 27, 0.8)";
+            ctx.strokeStyle = "#3f3f46";
+            drawRoundedRect(ctx, startX, currentY, pillW, pillH, 4);
+            ctx.stroke();
+            ctx.fillStyle = "#d4d4d8";
+            ctx.fillText("📅 " + date, startX + pillW/2, currentY + 16);
+
+            // Time Pill
+            ctx.fillStyle = "rgba(24, 24, 27, 0.8)";
+            drawRoundedRect(ctx, startX + pillW + gap, currentY, pillW, pillH, 4);
+            ctx.stroke();
+            ctx.fillStyle = "#d4d4d8";
+            ctx.fillText("⏰ " + time, startX + pillW + gap + pillW/2, currentY + 16);
+
+            return currentY + 60; // Increased Return Y for content start
+        }
+
+        async function drawFooter(ctx, yPosition, footerLeft, footerRight, sponsors) {
+             const footerH = 40; // Reduced height
+             const startY = ctx.canvas.height - footerH;
+             
+             // Divider
+             ctx.beginPath();
+             ctx.moveTo(25, startY);
+             ctx.lineTo(CANVAS_WIDTH - 25, startY);
+             ctx.strokeStyle = "rgba(255,255,255,0.1)";
+             ctx.stroke();
+
+             const contentY = startY + 28; // Adjusted for new height
+
+             // Left Text
+             ctx.textAlign = "left";
+             ctx.font = "italic bold 10px Inter";
+             ctx.fillStyle = "#52525b";
+             ctx.fillText(footerLeft, 25, contentY);
+
+             // Right Text
+             ctx.textAlign = "right";
+             ctx.fillText(footerRight, CANVAS_WIDTH - 25, contentY);
+
+             // Sponsors
+             if (sponsors && sponsors.length > 0) {
+                 const sponsorH = 26; // Reduced height to prevent protrusion
+                 let totalW = 0;
+                 const loadedSponsors = [];
+                 
+                 for (let src of sponsors) {
+                     const img = await loadImage(src);
+                     if(img) {
+                         const w = img.width * (sponsorH / img.height);
+                         loadedSponsors.push({img, w});
+                         totalW += w + 10;
+                     }
+                 }
+                 totalW -= 10; // remove last gap
+
+                 let currentX = (CANVAS_WIDTH - totalW) / 2;
+                 // Center vertically in footer (footerH is 40, sponsorH is 26) -> (40-26)/2 = 7px padding
+                 const sponsorY = startY + (footerH - sponsorH) / 2;
+                 
+                 for (let s of loadedSponsors) {
+                     ctx.drawImage(s.img, currentX, sponsorY, s.w, sponsorH);
+                     currentX += s.w + 10;
+                 }
+             }
+        }
+
+        // --- Render: Leaderboard ---
+        async function drawLeaderboard(canvas) {
+            const ctx = canvas.getContext('2d');
+            const bg = await loadImage(styles.backgroundImage);
+            const logo = await loadImage(styles.logoImage);
+            
+            // Calculate dynamic height based on 12 rows
+            const headerH = 240; // Updated for increased header spacing
+            const rowH = 32;
+            const rows = 12;
+            const footerH = 40;
+            const totalH = headerH + (rows * rowH) + footerH + 20; 
+            
+            canvas.height = totalH; // Resize canvas
+
+            let startY = await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+            
+            // Header Row
+            const colRank = 40;
+            const colName = 200;
+            const colWin = 350;
+            const colKill = 410;
+            const colPts = 500;
+            
+            ctx.fillStyle = "#71717a";
+            ctx.font = "bold 10px Inter";
+            ctx.textAlign = "left";
+            ctx.fillText("WIN", colWin, startY - 10);
+            ctx.fillText("KILLS", colKill, startY - 10);
+            ctx.fillText("PTS", colPts, startY - 10);
+
+            // Rows
             const teams = getAggregatedData(activeGroup);
             const displayData = [...teams];
-            while (displayData.length < 12) {
-                displayData.push({ name: '---', booyah: 0, kills: 0, points: 0 });
-            }
+            while (displayData.length < 12) displayData.push({ name: '---', booyah: 0, kills: 0, points: 0 });
             const top12 = displayData.slice(0, 12);
 
-            const container = document.getElementById('capture-area');
-            container.style.width = '550px'; // Enforce fixed width
-            container.style.fontFamily = "'Orbitron', sans-serif";
-            container.style.backgroundColor = '#000';
-            // Added quotes for safety with base64 strings
-            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
-            container.style.borderRadius = `16px`;
-            container.style.padding = '30px 25px'; 
-
-            let html = `
-                <div class="absolute inset-0 bg-black/80 z-0"></div>
-                <div class="relative z-10 w-full h-full flex flex-col items-center">
-                    
-                    ${styles.logoImage ? `
-                        <div class="mb-2 z-20">
-                            <img src="${styles.logoImage}" style="height: 50px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"/>
-                        </div>
-                    ` : ''}
-
-                    <h1 class="text-4xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center font-gamer">${styles.tournamentName}</h1>
-                    <h2 class="text-gold text-xs tracking-[0.4em] font-bold uppercase mb-0 text-center">OFFICIAL RESULTS</h2>
-                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-3 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-3"></div>'}
-
-                    <div class="flex gap-4 mb-6">
-                        <div class="flex items-center bg-zinc-900/90 border border-zinc-700/50 rounded px-4 py-1.5 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconCalendar} ${styles.tournamentDate}
-                        </div>
-                        <div class="flex items-center bg-zinc-900/90 border border-zinc-700/50 rounded px-4 py-1.5 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconClock} ${styles.tournamentTime}
-                        </div>
-                    </div>
-
-                    <!-- Table Header -->
-                    <div class="w-full flex px-4 mb-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                        <div class="w-12 text-left"></div> <!-- Rank space -->
-                        <div class="flex-1 text-left pl-2"></div> <!-- Name space -->
-                        <div class="w-10 text-center text-zinc-400">WIN</div>
-                        <div class="w-10 text-center text-zinc-400">KILLS</div>
-                        <div class="w-10 text-right text-gold">PTS</div>
-                    </div>
-
-                    <div class="w-full flex-1 min-h-0 flex flex-col justify-start gap-2 mb-2">
-            `;
-
-            top12.forEach((t, i) => {
+            for(let i=0; i<top12.length; i++) {
+                const t = top12[i];
                 const rank = i + 1;
-                let rowClass = "bg-zinc-900/40 border-l-4 border-transparent";
-                let rankTextClass = "text-zinc-600";
-                let ptsClass = "text-white";
-                let nameClass = "text-zinc-300";
-                
+                const y = startY + (i * (rowH + 4)); // 4px gap
+
+                // Row BG
+                let bgGradient = ctx.createLinearGradient(25, y, 525, y);
+                let borderColor = "#27272a";
+                let rankColor = "#52525b";
+                let textColor = "#d4d4d8";
+                let ptsColor = "#ffffff";
+
                 if (rank === 1) {
-                    rowClass = "bg-gradient-to-r from-orange-900/40 to-black/40 border-l-4 border-orange-500";
-                    rankTextClass = "text-orange-500 italic";
-                    ptsClass = "text-orange-500";
-                    nameClass = "text-white";
+                    bgGradient.addColorStop(0, "rgba(124, 45, 18, 0.4)"); 
+                    bgGradient.addColorStop(1, "rgba(0,0,0,0.4)");
+                    borderColor = "#f97316";
+                    rankColor = "#f97316";
+                    textColor = "#ffffff";
+                    ptsColor = "#f97316";
                 } else if (rank === 2) {
-                     rowClass = "bg-gradient-to-r from-slate-800/40 to-black/40 border-l-4 border-slate-400";
-                     rankTextClass = "text-slate-400 italic";
-                     ptsClass = "text-white";
-                     nameClass = "text-white";
+                    bgGradient.addColorStop(0, "rgba(30, 41, 59, 0.4)"); 
+                    bgGradient.addColorStop(1, "rgba(0,0,0,0.4)");
+                    borderColor = "#94a3b8";
+                    rankColor = "#94a3b8";
+                    textColor = "#ffffff";
                 } else if (rank === 3) {
-                     rowClass = "bg-gradient-to-r from-orange-900/20 to-black/40 border-l-4 border-orange-700";
-                     rankTextClass = "text-orange-700 italic";
-                     ptsClass = "text-orange-700";
-                     nameClass = "text-white";
+                    bgGradient.addColorStop(0, "rgba(124, 45, 18, 0.2)"); 
+                    bgGradient.addColorStop(1, "rgba(0,0,0,0.4)");
+                    borderColor = "#c2410c";
+                    rankColor = "#c2410c";
+                    textColor = "#ffffff";
+                    ptsColor = "#c2410c";
                 } else {
-                     rowClass = "bg-zinc-900/30 border-l-4 border-zinc-800";
-                     rankTextClass = "text-zinc-500 italic";
-                     ptsClass = "text-white";
+                    bgGradient = "rgba(24, 24, 27, 0.4)";
                 }
+
+                ctx.fillStyle = bgGradient;
+                ctx.fillRect(25, y, 500, rowH);
                 
-                // Logo check
-                const logoHtml = t.logo 
-                    ? `<img src="${t.logo}" class="w-5 h-5 object-contain mr-2">` 
-                    : '';
+                // Left Border
+                ctx.fillStyle = borderColor;
+                ctx.fillRect(25, y, 4, rowH);
 
-                html += `
-                <div class="w-full flex items-center h-8 px-3 rounded ${rowClass} shrink-0">
-                    <div class="w-10 font-black text-lg text-left ${rankTextClass}">#${rank}</div>
-                    <div class="flex-1 flex items-center pl-1 truncate">
-                        ${logoHtml}
-                        <span class="font-bold uppercase tracking-wide text-[10px] truncate ${nameClass}">${t.name}</span>
-                    </div>
-                    <div class="w-10 text-center text-xs font-medium text-zinc-400">${t.booyah > 0 ? t.booyah : '-'}</div>
-                    <div class="w-10 text-center text-xs font-bold text-white">${t.kills}</div>
-                    <div class="w-10 text-right">
-                        <span class="font-black italic text-sm ${ptsClass}">
-                            ${t.points}
-                        </span>
-                    </div>
-                </div>
-                `;
-            });
+                // Rank
+                ctx.font = "italic 900 16px Inter";
+                ctx.fillStyle = rankColor;
+                ctx.textAlign = "left";
+                ctx.fillText("#" + rank, 40, y + 22);
 
-            html += `
-                    </div>
-                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
-                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
-                        
-                        <div class="flex items-center gap-2">
-                             ${getSponsorsHtml()}
-                        </div>
+                // Logo
+                let nameX = 85;
+                if (t.logo) {
+                    const tLogo = await loadImage(t.logo);
+                    if(tLogo) {
+                        ctx.drawImage(tLogo, 80, y + 4, 20, 20);
+                        nameX = 110;
+                    }
+                }
 
-                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
+                // Name
+                ctx.font = "bold 12px Inter";
+                ctx.fillStyle = textColor;
+                ctx.fillText(t.name.toUpperCase(), nameX, y + 20);
 
-        function renderConfirmedTeamsBanner() {
-            // Just raw list, no sorting needed for confirmed usually, but let's keep array consistency
-            const teams = data[activeGroup] || [];
-            const displayData = [...teams];
-            while (displayData.length < 12) {
-                displayData.push({ name: '', logo: null });
+                // Stats
+                ctx.font = "bold 12px Inter";
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#a1a1aa"; // Greyish for stats
+                ctx.fillText(t.booyah > 0 ? t.booyah : '-', colWin + 10, y + 20);
+                
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(t.kills, colKill + 15, y + 20);
+
+                // PTS
+                ctx.font = "italic 900 14px Inter";
+                ctx.fillStyle = ptsColor;
+                ctx.textAlign = "right";
+                ctx.fillText(t.points, colPts + 15, y + 21);
             }
-            const top12 = displayData.slice(0, 12);
 
-            const container = document.getElementById('capture-area-confirmed');
-            container.style.width = '550px'; // Enforce fixed width
-            container.style.height = '550px'; // Enforce fixed height
-            container.style.fontFamily = "'Orbitron', sans-serif";
-            container.style.backgroundColor = '#000';
-            // Added quotes for safety
-            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
-            container.style.borderRadius = `16px`;
-            // Reduced bottom padding to 15px (from 30px) to lower the footer position
-            container.style.padding = '30px 25px 15px 25px';
-            
-            const shieldPath = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.67-.495-3.955a.75.75 0 00-.722-.515 11.208 11.208 0 01-7.877-3.08zM12 17.25a5.25 5.25 0 100-10.5 5.25 5.25 0 000 10.5z" clip-rule="evenodd" /></svg>`;
-            
-            let html = `
-                <div class="absolute inset-0 bg-black/60 z-0"></div>
-                <div class="relative z-10 w-full h-full flex flex-col items-center">
-                    
-                    ${styles.logoImage ? `
-                        <div class="mb-2 z-20">
-                            <img src="${styles.logoImage}" style="height: 45px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" />
-                        </div>
-                    ` : ''}
-
-                    <h1 class="text-3xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center">${styles.tournamentName}</h1>
-                    <h2 class="text-gold text-xs tracking-[0.4em] font-bold uppercase mb-0 text-center">CONFIRMED TEAMS</h2>
-                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-1 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-1"></div>'}
-
-                    <div class="flex gap-4 mb-2">
-                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconCalendar} ${styles.tournamentDate}
-                        </div>
-                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconClock} ${styles.tournamentTime}
-                        </div>
-                    </div>
-
-                    <!-- Grid: px-8. Grid padding logic maintained. -->
-                    <div class="grid grid-cols-4 gap-2 w-full flex-1 min-h-0 place-content-center mb-1 px-8">
-            `;
-            
-            top12.forEach((t, i) => {
-                const hasTeam = t.name && t.name !== '---' && t.name !== '';
-                
-                // Display specific logo if available, else SVG shield, else placeholder
-                let iconContent = shieldPath;
-                if (hasTeam && t.logo) {
-                    // Optimized size: w-24 h-24 (96px) - Maximize logo within the box without changing box size
-                    iconContent = `<img src="${t.logo}" class="w-full h-full object-contain drop-shadow-md" />`;
-                }
-
-                html += `
-                    <!-- Reduced padding from p-2 to p-1 to allow logo to grow closer to edges -->
-                    <div class="aspect-square relative bg-zinc-900/40 border border-zinc-800 rounded-lg flex flex-col items-center justify-center p-1 shadow-inner group overflow-hidden">
-                        <div class="absolute top-1.5 left-2 text-[8px] font-bold text-zinc-600 font-sans opacity-50">${i + 1}</div>
-                        
-                        <!-- Logo Container: Increased from w-20 (80px) to w-24 (96px) -->
-                        <div class="relative z-10 w-24 h-24 transition-transform group-hover:scale-105 duration-300 ${hasTeam && !t.logo ? 'text-gray-300' : 'text-zinc-800'}">
-                            ${iconContent}
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `
-                    </div>
-                    
-                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
-                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
-                        <div class="flex items-center gap-2">
-                             ${getSponsorsHtml()}
-                        </div>
-                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
-                    </div>
-                </div>
-            `;
-
-            container.innerHTML = html;
+            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
         }
 
-        function renderTop3Banner() {
+        // --- Render: Top 3 ---
+        async function drawTop3(canvas) {
+            const ctx = canvas.getContext('2d');
+            const bg = await loadImage(styles.backgroundImage);
+            const logo = await loadImage(styles.logoImage);
+            
+            canvas.height = 600; // Increased height for more space
+
+            await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+
             const teams = getAggregatedData(activeGroup);
             const t1 = teams[0] || { name: 'TBD', kills: 0 };
             const t2 = teams[1] || { name: 'TBD', kills: 0 };
             const t3 = teams[2] || { name: 'TBD', kills: 0 };
 
-            const container = document.getElementById('capture-area-top3');
-            container.style.width = '550px'; // Enforce fixed width
-            container.style.height = '550px'; // Enforce fixed height
-            container.style.fontFamily = "'Orbitron', sans-serif";
-            container.style.backgroundColor = '#000';
-            // Added quotes for safety
-            container.style.backgroundImage = styles.backgroundImage ? `url('${styles.backgroundImage}')` : 'none';
-            container.style.borderRadius = `16px`;
-            container.style.padding = '30px 25px';
+            // Podium Base Y
+            const podiumY = 480; // Lowered to account for header spacing
+            const w1 = 150; 
+            const w2 = 130;
+            const w3 = 130;
+            const h1 = 130;
+            const h2 = 100;
+            const h3 = 80;
 
-            const shieldSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.67-.495-3.955a.75.75 0 00-.722-.515 11.208 11.208 0 01-7.877-3.08zM12 17.25a5.25 5.25 0 100-10.5 5.25 5.25 0 000 10.5z" clip-rule="evenodd" /></svg>`;
-            
-            // Helper to get image or svg
-            const getIcon = (t, colorClass) => {
-                if(t.name !== 'TBD' && t.logo) {
-                    return `<img src="${t.logo}" class="w-full h-full object-contain drop-shadow-md" />`;
+            const cX = CANVAS_WIDTH / 2;
+            const x1 = cX - w1/2;
+            const x2 = x1 - w2 - 10;
+            const x3 = x1 + w1 + 10;
+
+            const drawPodiumBox = async (x, width, height, team, rankColor, rankName, rankNum) => {
+                const boxY = podiumY - height;
+                
+                // Gradient Box
+                const grad = ctx.createLinearGradient(x, boxY, x, podiumY);
+                if (rankNum === 1) {
+                    grad.addColorStop(0, "rgba(234, 179, 8, 0.6)");
+                    grad.addColorStop(1, "rgba(234, 179, 8, 0.1)");
+                    ctx.strokeStyle = "#facc15";
+                } else if (rankNum === 2) {
+                    grad.addColorStop(0, "rgba(82, 82, 91, 0.8)");
+                    grad.addColorStop(1, "rgba(39, 39, 42, 0.4)");
+                    ctx.strokeStyle = "#71717a";
+                } else {
+                    grad.addColorStop(0, "rgba(194, 65, 12, 0.6)");
+                    grad.addColorStop(1, "rgba(194, 65, 12, 0.1)");
+                    ctx.strokeStyle = "#ea580c";
                 }
-                return `<div class="${colorClass}">${shieldSvg}</div>`;
+                
+                // Box Body
+                ctx.fillStyle = grad;
+                // Custom rounded top rect
+                ctx.beginPath();
+                ctx.moveTo(x + 10, boxY);
+                ctx.lineTo(x + width - 10, boxY);
+                ctx.quadraticCurveTo(x + width, boxY, x + width, boxY + 10);
+                ctx.lineTo(x + width, podiumY);
+                ctx.lineTo(x, podiumY);
+                ctx.lineTo(x, boxY + 10);
+                ctx.quadraticCurveTo(x, boxY, x + 10, boxY);
+                ctx.fill();
+                
+                // Top border
+                ctx.beginPath();
+                ctx.moveTo(x, boxY);
+                ctx.lineTo(x + width, boxY);
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Team Name
+                ctx.fillStyle = "#fff";
+                ctx.font = "900 12px Orbitron";
+                ctx.textAlign = "center";
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 4;
+                ctx.fillText(team.name.toUpperCase(), x + width/2, boxY + 25);
+                ctx.shadowBlur = 0;
+
+                // Rank Name
+                ctx.fillStyle = rankColor;
+                ctx.font = "bold 8px Orbitron";
+                ctx.fillText(rankName.toUpperCase(), x + width/2, boxY + 38);
+
+                // Kills
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                drawRoundedRect(ctx, x + width/2 - 25, boxY + 45, 50, 16, 4);
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 10px Inter";
+                ctx.fillText(team.kills + " KILLS", x + width/2, boxY + 56);
+
+                // Logo
+                const logoSize = rankNum === 1 ? 140 : 100;
+                const logoY = boxY - logoSize + 10; // Raised to +10 from +25
+                
+                if (team.logo) {
+                    const img = await loadImage(team.logo);
+                    if(img) {
+                        // Drop shadow
+                        ctx.shadowColor = rankNum === 1 ? "rgba(234,179,8,0.5)" : "rgba(255,255,255,0.2)";
+                        ctx.shadowBlur = 20;
+                        // Centered containment
+                        const ratio = Math.min(logoSize / img.width, logoSize / img.height);
+                        const lw = img.width * ratio;
+                        const lh = img.height * ratio;
+                        ctx.drawImage(img, x + (width - lw)/2, logoY + (logoSize - lh)/2, lw, lh);
+                        ctx.shadowBlur = 0;
+                    }
+                } else {
+                    // Placeholder Shield
+                    ctx.font = "900 80px Inter";
+                    ctx.fillStyle = "rgba(255,255,255,0.1)";
+                    ctx.fillText("🛡️", x + width/2, logoY + 80);
+                    ctx.font = "900 40px Inter";
+                    ctx.fillStyle = "rgba(0,0,0,0.5)";
+                    ctx.fillText(rankNum, x + width/2, logoY + 80);
+                }
             };
 
-            container.innerHTML = `
-                <div class="absolute inset-0 bg-black/60 z-0"></div>
-                
-                <div class="relative z-10 w-full h-full flex flex-col items-center">
-                    
-                     ${styles.logoImage ? `
-                        <div class="mb-2 z-20">
-                            <img src="${styles.logoImage}" style="height: 45px; width: auto; object-fit: contain;" class="drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"/>
-                        </div>
-                    ` : ''}
+            // Order: 2, 1, 3 (z-index implicit by draw order, draw 2 and 3 first)
+            await drawPodiumBox(x2, w2, h2, t2, "#a1a1aa", "SILVER", 2);
+            await drawPodiumBox(x3, w3, h3, t3, "#fb923c", "BRONZE", 3);
+            await drawPodiumBox(x1, w1, h1, t1, "#facc15", "CHAMPION", 1);
 
-                    <h1 class="text-3xl font-black italic tracking-tighter text-white mb-0 leading-none drop-shadow-lg uppercase text-center">${styles.tournamentName}</h1>
-                    <h2 class="text-gold text-xs tracking-[0.5em] font-bold uppercase mb-0 text-center">TOP 3 TEAMS</h2>
-                    ${activeGroup !== 'ESPECIAL' ? `<p class="text-[10px] text-zinc-400 font-bold tracking-widest uppercase mb-6 text-center">GROUP ${activeGroup}</p>` : '<div class="mb-6"></div>'}
-
-                     <div class="flex gap-4 mb-8">
-                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconCalendar} ${styles.tournamentDate}
-                        </div>
-                        <div class="flex items-center bg-zinc-900/80 border border-zinc-700 rounded px-3 py-1 text-zinc-300 text-[10px] font-bold tracking-wider uppercase shadow-lg">
-                            ${iconClock} ${styles.tournamentTime}
-                        </div>
-                    </div>
-
-                    <!-- PODIUM -->
-                    <div class="w-full flex items-end justify-center gap-2 mb-4 flex-1 min-h-0 px-4">
-                        
-                        <!-- 2nd -->
-                        <div class="w-1/3 flex flex-col items-center justify-end">
-                             <div class="w-28 h-28 mb-[-18px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
-                                 ${getIcon(t2, 'text-zinc-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] w-full h-full')}
-                                 ${!t2.logo ? '<div class="absolute inset-0 flex items-center justify-center text-xl font-black text-black opacity-50">2</div>' : ''}
-                             </div>
-                             <div class="w-full bg-gradient-to-t from-zinc-800 to-zinc-900 border-t-2 border-zinc-500 h-24 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-lg">
-                                 <div class="text-[10px] font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 drop-shadow-md">${t2.name}</div>
-                                 <span class="text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Silver</span>
-                                 <span class="text-[10px] font-bold text-white bg-black/30 px-2 rounded mt-0.5 border border-white/5">${t2.kills} Kills</span>
-                             </div>
-                        </div>
-
-                        <!-- 1st -->
-                        <div class="w-1/3 flex flex-col items-center justify-end">
-                             <div class="w-40 h-40 mb-[-25px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
-                                 ${getIcon(t1, 'text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)] w-full h-full')}
-                                 ${!t1.logo ? '<div class="absolute inset-0 flex items-center justify-center text-3xl font-black text-black opacity-40">1</div>' : ''}
-                             </div>
-                             <div class="w-full bg-gradient-to-t from-yellow-900/60 to-yellow-600/20 border-t-2 border-yellow-400 h-32 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
-                                 <div class="text-xs font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 text-shadow-md">${t1.name}</div>
-                                 <span class="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mb-0.5">Champion</span>
-                                 <span class="text-xs font-bold text-white bg-black/30 px-2 py-0.5 rounded border border-white/10">${t1.kills} Kills</span>
-                             </div>
-                        </div>
-
-                        <!-- 3rd -->
-                        <div class="w-1/3 flex flex-col items-center justify-end">
-                             <div class="w-28 h-28 mb-[-18px] relative z-20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
-                                 ${getIcon(t3, 'text-orange-700 drop-shadow-[0_0_10px_rgba(194,65,12,0.3)] w-full h-full')}
-                                 ${!t3.logo ? '<div class="absolute inset-0 flex items-center justify-center text-xl font-black text-black opacity-50">3</div>' : ''}
-                             </div>
-                             <div class="w-full bg-gradient-to-t from-orange-900/40 to-orange-800/20 border-t-2 border-orange-600 h-20 rounded-t-xl flex flex-col justify-center items-center relative z-10 pt-4 shadow-lg">
-                                 <div class="text-[10px] font-black text-white uppercase truncate w-[90%] text-center leading-tight mb-1 drop-shadow-md">${t3.name}</div>
-                                 <span class="text-[8px] text-orange-500 font-bold uppercase tracking-wider">Bronze</span>
-                                 <span class="text-[10px] font-bold text-white bg-black/30 px-2 rounded mt-0.5 border border-white/5">${t3.kills} Kills</span>
-                             </div>
-                        </div>
-
-                    </div>
-
-                    <!-- FOOTER -->
-                    <div class="w-full flex justify-between items-end pt-4 border-t border-white/10 mt-auto">
-                        <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest italic">${styles.footerTextLeft}</div>
-                        <div class="flex items-center gap-2">
-                             ${getSponsorsHtml()}
-                        </div>
-                        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest italic text-right">${styles.footerTextRight}</div>
-                    </div>
-                </div>
-            `;
+            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
         }
 
-        // --- Initialization ---
+        // --- Render: Confirmed ---
+        async function drawConfirmed(canvas) {
+            const ctx = canvas.getContext('2d');
+            const bg = await loadImage(styles.backgroundImage);
+            const logo = await loadImage(styles.logoImage);
+            
+            canvas.height = 600; // Increased height for more space
+            
+            let startY = await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+            startY += 10; // Positive separation for better spacing
 
+            const teams = data[activeGroup] || [];
+            const displayData = [...teams];
+            while (displayData.length < 12) displayData.push({ name: '', logo: null });
+            const top12 = displayData.slice(0, 12);
+
+            // Grid Config
+            const cols = 4;
+            const gap = 10;
+            const boxSize = 100;
+            const totalGridW = (cols * boxSize) + ((cols - 1) * gap);
+            const startX = (CANVAS_WIDTH - totalGridW) / 2;
+            
+            for(let i=0; i<top12.length; i++) {
+                const t = top12[i];
+                const r = Math.floor(i / cols);
+                const c = i % cols;
+                const x = startX + c * (boxSize + gap);
+                const y = startY + r * (boxSize + gap);
+
+                // Box BG
+                ctx.fillStyle = "rgba(24, 24, 27, 0.5)";
+                ctx.strokeStyle = "#3f3f46";
+                ctx.lineWidth = 1;
+                drawRoundedRect(ctx, x, y, boxSize, boxSize, 8);
+                ctx.stroke();
+
+                // Number
+                ctx.fillStyle = "rgba(255,255,255,0.3)";
+                ctx.font = "bold 10px Inter";
+                ctx.fillText(i + 1, x + 10, y + 15);
+
+                // Logo
+                if (t.logo) {
+                    const img = await loadImage(t.logo);
+                    if(img) {
+                        const maxS = 85;
+                        const ratio = Math.min(maxS / img.width, maxS / img.height);
+                        const w = img.width * ratio;
+                        const h = img.height * ratio;
+                        ctx.drawImage(img, x + (boxSize - w)/2, y + (boxSize - h)/2 - 5, w, h);
+                    }
+                } else {
+                     ctx.fillStyle = "rgba(255,255,255,0.05)";
+                     ctx.font = "40px Inter";
+                     ctx.textAlign = "center";
+                     ctx.fillText("🛡️", x + boxSize/2, y + boxSize/2 + 15);
+                     ctx.textAlign = "left"; // reset
+                }
+            }
+            
+            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
+        }
+
+        // --- Main Draw Controller ---
+        async function renderCanvas(type, containerId) {
+             const container = document.getElementById(containerId);
+             container.innerHTML = '';
+             const canvas = document.createElement('canvas');
+             canvas.width = 550;
+             canvas.id = "canvas-" + type;
+             
+             // Initial height, adjusted inside functions
+             if(type === 'results') await drawLeaderboard(canvas);
+             if(type === 'top3') await drawTop3(canvas);
+             if(type === 'confirmed') await drawConfirmed(canvas);
+             
+             // Scale down for preview if needed via CSS, but canvas stays hi-res
+             canvas.style.maxWidth = "100%";
+             canvas.style.height = "auto";
+             
+             container.appendChild(canvas);
+        }
+
+        function renderAll() {
+             renderCanvas('results', 'preview-results');
+             renderCanvas('top3', 'preview-top3');
+             renderCanvas('confirmed', 'preview-confirmed');
+             renderGroupButtons();
+        }
+
+        function downloadCanvas(type) {
+            const canvas = document.getElementById("canvas-" + type);
+            if(canvas) {
+                const link = document.createElement('a');
+                const cleanName = (styles.tournamentName || 'XT_UND').replace(/[^a-z0-9]/gi, '_');
+                link.download = `${cleanName}_${type}_${activeGroup}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0); // Max quality
+                link.click();
+            }
+        }
+        
+        // Initial setup
         window.onload = function() {
             loadData();
-            renderGroupButtons();
             
-            // Add Team Form Listener
+            // Add Team
             document.getElementById('add-team-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const nameInput = document.getElementById('new-team-name');
                 const logoInput = document.getElementById('new-team-logo');
-                const name = nameInput.value.trim();
-                
-                if(name) {
-                    const newTeam = {
-                        id: Date.now().toString(),
-                        name: name,
-                        logo: null,
-                        matches: Array(5).fill(null).map(()=>({p:'', k:''}))
-                    };
-
-                    if(logoInput.files && logoInput.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(evt) {
-                            newTeam.logo = evt.target.result;
-                            if(!data[activeGroup]) data[activeGroup] = [];
-                            data[activeGroup].push(newTeam);
-                            saveData();
-                            renderTeamEditor();
-                            nameInput.value = '';
-                            logoInput.value = '';
-                        }
-                        reader.readAsDataURL(logoInput.files[0]);
-                    } else {
+                if(nameInput.value.trim()) {
+                    const newTeam = { id: Date.now().toString(), name: nameInput.value.trim(), logo: null, matches: Array(5).fill(null).map(()=>({p:'', k:''})) };
+                    const finish = () => {
                         if(!data[activeGroup]) data[activeGroup] = [];
                         data[activeGroup].push(newTeam);
-                        saveData();
-                        renderTeamEditor();
-                        nameInput.value = '';
-                    }
+                        saveData(); renderTeamEditor(); renderAll();
+                        nameInput.value = ''; logoInput.value = '';
+                    };
+                    if(logoInput.files[0]) {
+                        const r = new FileReader();
+                        r.onload = (evt) => { newTeam.logo = evt.target.result; finish(); };
+                        r.readAsDataURL(logoInput.files[0]);
+                    } else finish();
                 }
             });
 
-            // Settings Inputs Listeners
+            // Settings Listeners
             ['tournamentName', 'tournamentDate', 'tournamentTime', 'footerTextLeft', 'footerTextRight'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    el.addEventListener('input', (e) => {
-                        styles[id] = e.target.value;
-                        saveStyles();
-                        renderAll();
-                    });
-                }
+                document.getElementById(id).addEventListener('input', (e) => { styles[id] = e.target.value; saveStyles(); renderAll(); });
             });
 
-            // Image Upload Listeners
+            // Image Uploads
             document.getElementById('logoImage').addEventListener('change', (e) => handleImageUpload(e, 'logoImage'));
             document.getElementById('backgroundImage').addEventListener('change', (e) => handleImageUpload(e, 'backgroundImage'));
-            
-            // Sponsor add
             document.getElementById('addSponsorInput').addEventListener('change', (e) => {
-                if(e.target.files && e.target.files[0]){
-                    const reader = new FileReader();
-                    reader.onload = function(evt){
-                        if(!styles.sponsorLogos) styles.sponsorLogos = [];
-                        styles.sponsorLogos.push(evt.target.result);
-                        saveStyles();
-                        renderSponsorListInSettings();
-                        renderAll();
-                        e.target.value = ''; // clear
-                    };
-                    reader.readAsDataURL(e.target.files[0]);
-                }
+                 if(e.target.files[0]){
+                    const r = new FileReader();
+                    r.onload = (evt) => { if(!styles.sponsorLogos) styles.sponsorLogos=[]; styles.sponsorLogos.push(evt.target.result); saveStyles(); renderSponsorListInSettings(); renderAll(); e.target.value=''; };
+                    r.readAsDataURL(e.target.files[0]);
+                 }
             });
-
-            // Initial Render
-            setView('LEADERBOARD');
             
-            // Set previews if exist
-            if(styles.logoImage) {
-                 const container = document.getElementById('preview-logo-container');
-                 const input = container.querySelector('input');
-                 const img = document.createElement('img');
-                 img.src = styles.logoImage;
-                 img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
-                 container.innerHTML = '';
-                 container.appendChild(img);
-                 container.appendChild(input);
-                 // Re-attach because innerHTML wiped it
-                 input.addEventListener('change', (e) => handleImageUpload(e, 'logoImage'));
-            }
-            if(styles.backgroundImage) {
-                 const container = document.getElementById('preview-bg-container');
-                 const input = container.querySelector('input');
-                 const img = document.createElement('img');
-                 img.src = styles.backgroundImage;
-                 img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
-                 container.innerHTML = '';
-                 container.appendChild(img);
-                 container.appendChild(input);
-                 input.addEventListener('change', (e) => handleImageUpload(e, 'backgroundImage'));
-            }
+            // Initial
+            setView('LEADERBOARD');
+            renderGroupButtons();
+            renderSponsorListInSettings();
         };
+
     </script>
 </body>
 </html>
