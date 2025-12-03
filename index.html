@@ -121,7 +121,7 @@
                 </div>
                 <h1 class="text-lg font-bold text-white tracking-wide font-gamer"><span id="app-header-title">XT UND</span> <span class="text-orange-500 text-xs font-normal align-middle ml-1">MANAGER</span></h1>
             </div>
-            <div class="text-xs text-gray-500 font-medium">v6.0 Storage+</div>
+            <div class="text-xs text-gray-500 font-medium">v6.9.2 Logo Size Fix</div>
         </div>
         
         <!-- Group Selector (Horizontal Scroll) -->
@@ -181,6 +181,21 @@
                     <!-- Canvas injected here -->
                 </div>
             </div>
+
+            <!-- Action Bar Presentation -->
+            <div class="w-full flex justify-between items-center mb-4 border-t border-zinc-800 pt-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Presentation</h2>
+                <button onclick="downloadCanvas('presentation')" class="bg-purple-600 active:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-transform active:scale-95">
+                   <span>💾 SAVE INFO</span>
+               </button>
+            </div>
+
+             <!-- Capture Area: Presentation -->
+             <div class="w-full overflow-x-auto rounded-2xl shadow-2xl bg-black mb-8 border border-zinc-800">
+                <div id="preview-presentation" class="min-w-[550px] w-[550px] mx-auto bg-black flex justify-center">
+                    <!-- Canvas injected here -->
+                </div>
+            </div>
         </div>
 
         <!-- VIEW: EDITOR (Data Entry) -->
@@ -221,7 +236,7 @@
         <div id="view-style" class="fade-in hidden w-full pb-8">
             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <span class="w-1 h-6 bg-blue-500 rounded-full block"></span>
-                Tournament Settings
+                Settings for Group <span id="style-group-title" class="text-blue-500">A</span>
             </h2>
             
             <div class="space-y-6">
@@ -244,12 +259,17 @@
                                 <input type="text" id="tournamentTime" class="input-modern" placeholder="HH:MM">
                             </div>
                         </div>
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">Registration Price (Paypal)</label>
+                            <input type="text" id="registrationPrice" class="input-modern" placeholder="$5 USD">
+                            <p class="text-[10px] text-gray-500 mt-1">Visible only in Presentation Banner</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Section: Footer Text -->
+                <!-- Section: Top Text -->
                 <div class="card">
-                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Footer Text</h3>
+                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Top Banner Text</h3>
                     <div class="space-y-4">
                         <div>
                             <label class="text-xs text-gray-500 block mb-1">Left (Small Text)</label>
@@ -292,7 +312,7 @@
                     
                     <!-- Sponsors -->
                     <div class="pt-2 border-t border-gray-800 mt-2">
-                        <label class="text-xs text-gray-500 block mb-2">Sponsors (Footer)</label>
+                        <label class="text-xs text-gray-500 block mb-2">Footer Sponsors</label>
                         <div class="flex items-center gap-2 mb-2">
                             <div class="file-upload-btn bg-zinc-800 text-white px-3 py-2 rounded text-xs font-medium flex items-center gap-2 border border-zinc-700">
                                 <span>+ Add Sponsor</span>
@@ -308,7 +328,7 @@
                 <!-- Danger Zone -->
                 <div class="pt-4">
                     <button onclick="resetStyles()" class="w-full py-3 rounded-lg border border-red-900/50 text-red-500 text-sm font-medium hover:bg-red-900/10 transition-colors">
-                        Reset All Settings
+                        Reset Settings for Group <span id="reset-group-name">A</span>
                     </button>
                 </div>
                 
@@ -354,17 +374,18 @@
 
     <script>
         // --- State ---
-        const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'ESPECIAL', 'FINALS'];
+        const GROUPS = ['A', 'B', 'C', 'D', 'E', 'F', 'ESPECIAL', 'FINALS', '3 SALAS'];
         let activeGroup = 'A';
         let currentView = 'LEADERBOARD'; 
         
         // Data Structure
-        let data = { A: [], B: [], C: [], D: [], E: [], F: [], ESPECIAL: [], FINALS: [] };
+        let data = { A: [], B: [], C: [], D: [], E: [], F: [], ESPECIAL: [], FINALS: [], '3 SALAS': [] };
         
-        const DEFAULT_STYLES = {
+        const DEFAULT_STYLE_TEMPLATE = {
             tournamentName: 'XT UND',
             tournamentDate: '24/11/2025',
             tournamentTime: '20:00 HRS',
+            registrationPrice: '', // New Field
             footerTextLeft: 'EUROPA FREE FIRE',
             footerTextCenter: '',
             footerTextRight: 'XT UND SERIES',
@@ -372,7 +393,13 @@
             backgroundImage: null, 
             sponsorLogos: [],
         };
-        let styles = { ...DEFAULT_STYLES };
+        
+        // Styles map: styles[groupName] = styleObject
+        let styles = {};
+        // Initialize defaults
+        GROUPS.forEach(g => {
+            styles[g] = JSON.parse(JSON.stringify(DEFAULT_STYLE_TEMPLATE));
+        });
 
         // --- Persistence (IndexedDB + LocalStorage Hybrid) ---
         
@@ -439,8 +466,6 @@
                         console.log("Migrating Data to IndexedDB...");
                         storedData = JSON.parse(lsData);
                         await dbSet('xt_und_data_v2', storedData);
-                        // Optional: Clear old LS to free space
-                        // localStorage.removeItem('xt_und_data_v2');
                     }
                 }
                 
@@ -457,12 +482,32 @@
                 if (storedData) {
                     data = storedData;
                     if(!data.ESPECIAL) data.ESPECIAL = [];
+                    if(!data['3 SALAS']) data['3 SALAS'] = [];
                 }
 
                 if (storedStyles) {
-                    styles = { ...DEFAULT_STYLES, ...storedStyles };
-                    if (styles.sponsorLogo && (!styles.sponsorLogos || styles.sponsorLogos.length === 0)) {
-                        styles.sponsorLogos = [styles.sponsorLogo];
+                    // Check for migration from V1 (Global Style) to V2 (Group Styles)
+                    // Old format: { tournamentName: '...' }
+                    // New format: { 'A': { tournamentName: ... }, 'B': ... }
+                    
+                    if (storedStyles.tournamentName) {
+                        console.log("Migrating Styles from Global to Per-Group...");
+                        // Propagate global style to all groups
+                        GROUPS.forEach(g => {
+                            styles[g] = { ...DEFAULT_STYLE_TEMPLATE, ...storedStyles };
+                            // Fix legacy sponsor array issue during migration
+                            if (styles[g].sponsorLogo && (!styles[g].sponsorLogos || styles[g].sponsorLogos.length === 0)) {
+                                styles[g].sponsorLogos = [styles[g].sponsorLogo];
+                            }
+                        });
+                        saveStyles(); // Save the new structure immediately
+                    } else {
+                        // New format - load directly
+                        styles = storedStyles;
+                        // Ensure all groups exist in styles (in case of new group addition)
+                        GROUPS.forEach(g => {
+                            if (!styles[g]) styles[g] = JSON.parse(JSON.stringify(DEFAULT_STYLE_TEMPLATE));
+                        });
                     }
                 }
 
@@ -478,9 +523,7 @@
 
         async function saveData() {
             try {
-                // Save heavy data to IDB
                 await dbSet('xt_und_data_v2', data);
-                // Save lightweight state to LS
                 localStorage.setItem('xt_und_active_group', activeGroup);
             } catch (e) { console.error("Save Data Error:", e); }
         }
@@ -548,11 +591,23 @@
                 renderTeamEditor();
             } else if (view === 'STYLE') {
                 document.getElementById('view-style').classList.remove('hidden');
-                document.getElementById('tournamentName').value = styles.tournamentName || '';
-                document.getElementById('tournamentDate').value = styles.tournamentDate || '';
-                document.getElementById('tournamentTime').value = styles.tournamentTime || '';
-                document.getElementById('footerTextLeft').value = styles.footerTextLeft || '';
-                document.getElementById('footerTextRight').value = styles.footerTextRight || '';
+                
+                // Update Style Inputs for current group
+                const s = styles[activeGroup];
+                document.getElementById('style-group-title').textContent = activeGroup;
+                document.getElementById('reset-group-name').textContent = activeGroup;
+                
+                document.getElementById('tournamentName').value = s.tournamentName || '';
+                document.getElementById('tournamentDate').value = s.tournamentDate || '';
+                document.getElementById('tournamentTime').value = s.tournamentTime || '';
+                document.getElementById('registrationPrice').value = s.registrationPrice || ''; // New
+                document.getElementById('footerTextLeft').value = s.footerTextLeft || '';
+                document.getElementById('footerTextRight').value = s.footerTextRight || '';
+                
+                // Update Image Previews in Settings
+                updateImagePreview('preview-logo-container', s.logoImage, '🛡️');
+                updateImagePreview('preview-bg-container', s.backgroundImage, '🖼️');
+                
                 renderSponsorListInSettings();
             }
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('text-orange-500'));
@@ -560,6 +615,21 @@
             if(view === 'LEADERBOARD') document.getElementById('nav-leaderboard').classList.add('text-orange-500');
             if(view === 'REGISTER') document.getElementById('nav-editor').classList.add('text-orange-500');
             if(view === 'STYLE') document.getElementById('nav-style').classList.add('text-orange-500');
+        }
+        
+        function updateImagePreview(containerId, imageSrc, icon) {
+             const container = document.getElementById(containerId);
+             const input = container.querySelector('input');
+             container.innerHTML = '';
+             if (imageSrc) {
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
+                container.appendChild(img);
+             } else {
+                 container.innerHTML = `<span class="text-2xl mb-1 z-0">${icon}</span><span class="text-[10px] text-gray-400 z-0">Tap to upload</span>`;
+             }
+             container.appendChild(input);
         }
         
         // --- Render Helpers ---
@@ -575,13 +645,16 @@
                     ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/40' 
                     : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white'
                 }`;
-                btn.textContent = g === 'ESPECIAL' ? 'ESPECIAL' : (g.length > 2 ? g : `GROUP ${g}`);
+                btn.textContent = (g === 'ESPECIAL' || g === 'FINALS') ? g : (g.length > 2 ? g : `GROUP ${g}`);
                 btn.onclick = () => {
                     activeGroup = g;
                     saveData();
                     renderGroupButtons();
-                    renderAll(); 
+                    
+                    // Logic to refresh view content based on current view
                     if(currentView === 'REGISTER') renderTeamEditor(); 
+                    if(currentView === 'STYLE') setView('STYLE'); // Refreshes inputs
+                    if(currentView === 'LEADERBOARD') renderAll();
                 };
                 container.appendChild(btn);
             });
@@ -667,7 +740,12 @@
         }
 
         function resetStyles() {
-            if(confirm('Reset all styles?')) { styles = { ...DEFAULT_STYLES }; saveStyles(); setView('STYLE'); renderAll(); }
+            if(confirm(`Reset all styles for Group ${activeGroup}?`)) { 
+                styles[activeGroup] = JSON.parse(JSON.stringify(DEFAULT_STYLE_TEMPLATE)); 
+                saveStyles(); 
+                setView('STYLE'); 
+                renderAll(); 
+            }
         }
 
         function resetData() {
@@ -675,20 +753,9 @@
         }
 
         function clearImage(key) {
-            styles[key] = null;
+            styles[activeGroup][key] = null;
             saveStyles();
-            if(key === 'logoImage') {
-                 const container = document.getElementById('preview-logo-container');
-                 const input = container.querySelector('input');
-                 container.innerHTML = `<span class="text-2xl mb-1 z-0">🛡️</span><span class="text-[10px] text-gray-400 z-0">Tap to upload</span>`;
-                 container.appendChild(input);
-            }
-            if(key === 'backgroundImage') {
-                 const container = document.getElementById('preview-bg-container');
-                 const input = container.querySelector('input');
-                 container.innerHTML = `<span class="text-2xl mb-1 z-0">🖼️</span><span class="text-[10px] text-gray-400 z-0">Tap to upload</span>`;
-                 container.appendChild(input);
-            }
+            setView('STYLE'); // refresh previews
             renderAll();
         }
 
@@ -697,18 +764,10 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    styles[key] = evt.target.result;
+                    styles[activeGroup][key] = evt.target.result;
                     saveStyles();
+                    setView('STYLE'); // refresh previews
                     renderAll();
-                    const containerId = key === 'logoImage' ? 'preview-logo-container' : 'preview-bg-container';
-                    const container = document.getElementById(containerId);
-                    const input = container.querySelector('input');
-                    const img = document.createElement('img');
-                    img.src = evt.target.result;
-                    img.className = 'absolute inset-0 w-full h-full object-cover z-10 rounded-lg opacity-50 hover:opacity-100 transition-opacity';
-                    container.innerHTML = '';
-                    container.appendChild(img);
-                    container.appendChild(input);
                 };
                 reader.readAsDataURL(file);
             }
@@ -717,7 +776,8 @@
         function renderSponsorListInSettings() {
             const container = document.getElementById('sponsor-list');
             container.innerHTML = '';
-            (styles.sponsorLogos || []).forEach((logo, idx) => {
+            const s = styles[activeGroup];
+            (s.sponsorLogos || []).forEach((logo, idx) => {
                 const div = document.createElement('div');
                 div.className = 'relative w-10 h-10 border border-zinc-700 rounded bg-black flex items-center justify-center';
                 div.innerHTML = `<img src="${logo}" class="max-w-full max-h-full object-contain"><button onclick="removeSponsor(${idx})" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px]">&times;</button>`;
@@ -726,7 +786,7 @@
         }
 
         function removeSponsor(idx) {
-            styles.sponsorLogos.splice(idx, 1);
+            styles[activeGroup].sponsorLogos.splice(idx, 1);
             saveStyles();
             renderSponsorListInSettings();
             renderAll();
@@ -769,7 +829,7 @@
         }
 
         // --- Draw Header (Logo, Title, Group, Date/Time) ---
-        async function drawHeader(ctx, title, group, date, time, bgImage, logoImage) {
+        async function drawHeader(ctx, title, group, date, time, bgImage, logoImage, textLeft, textRight, isPresentation = false) {
             // Background
             ctx.fillStyle = "#000000";
             ctx.fillRect(0, 0, CANVAS_WIDTH, ctx.canvas.height);
@@ -791,14 +851,30 @@
                 ctx.fillRect(0,0, CANVAS_WIDTH, ctx.canvas.height);
             }
 
+            // Draw Top Texts (Previously Footer Texts)
+            ctx.font = "italic bold 10px Inter";
+            ctx.fillStyle = "#a1a1aa"; // Zinc-400 for visibility
+            
+            // Left Text
+            ctx.textAlign = "left";
+            ctx.fillText(textLeft, 25, 25);
+
+            // Right Text
+            ctx.textAlign = "right";
+            ctx.fillText(textRight, CANVAS_WIDTH - 25, 25);
+
+
             let currentY = 30; // Increased spacing
 
             // Tournament Logo
             if (logoImage) {
-                const logoH = 45;
+                // Modified: Bigger logo for standard views (was 45 -> 75)
+                const logoH = isPresentation ? 140 : 75;
                 const logoW = logoImage.width * (logoH / logoImage.height);
                 ctx.drawImage(logoImage, (CANVAS_WIDTH - logoW) / 2, currentY, logoW, logoH);
-                currentY += 60; // Increased gap
+                
+                // Modified: Dynamic gap
+                currentY += logoH + 20; 
             } else {
                 currentY += 20;
             }
@@ -811,7 +887,7 @@
             ctx.shadowBlur = 10;
             ctx.fillText(title.toUpperCase(), CANVAS_WIDTH / 2, currentY + 10);
             ctx.shadowBlur = 0;
-            currentY += 30; // Increased gap
+            currentY += isPresentation ? 25 : 30; // Compact gap for presentation
 
             // Subtitle
             ctx.font = FONT_SUBTITLE;
@@ -820,47 +896,74 @@
             let subtitle = "OFFICIAL RESULTS";
             if(ctx.canvas.id.includes("top3")) subtitle = "TOP 3 TEAMS";
             if(ctx.canvas.id.includes("confirmed")) subtitle = "CONFIRMED TEAMS";
+            if(ctx.canvas.id.includes("presentation")) subtitle = "SEASON INFO";
             
             ctx.fillText(subtitle, CANVAS_WIDTH / 2, currentY);
-            currentY += 20; // Increased gap
+            currentY += isPresentation ? 20 : 20; // Increased to 20 from 15
 
             // Group
-            ctx.font = "bold 10px Orbitron";
-            ctx.fillStyle = "#a1a1aa";
-            ctx.letterSpacing = "2px";
-            
-            const groupText = group === 'ESPECIAL' ? 'ESPECIAL' : `GROUP ${group}`;
-            ctx.fillText(groupText, CANVAS_WIDTH / 2, currentY);
-            currentY += 20; // Increased gap
+            if (group) {
+                ctx.font = "bold 10px Orbitron";
+                ctx.fillStyle = "#a1a1aa";
+                ctx.letterSpacing = "2px";
+                
+                const groupText = (group === 'ESPECIAL' || group === '3 SALAS' || group === 'FINALS') ? group : `GROUP ${group}`;
+                ctx.fillText(groupText, CANVAS_WIDTH / 2, currentY);
+                currentY += 20; 
+            } else {
+                currentY += isPresentation ? 25 : 15; // Increased to 25 from 10/20 for presentation pills
+            }
 
-            // Date / Time Pills
-            const pillW = 100;
+            // Date / Time Pills - Dynamic Width & Vertical Centering Fix
+            ctx.font = "bold 10px Inter";
+            const dateStr = "📅 " + date;
+            const timeStr = "⏰ " + time;
+            
+            const dateMetrics = ctx.measureText(dateStr);
+            const timeMetrics = ctx.measureText(timeStr);
+            
+            // Minimum 100px, add generous padding
+            const padding = 30; 
+            const minW = 110;
+            const dateW = Math.max(minW, dateMetrics.width + padding);
+            const timeW = Math.max(minW, timeMetrics.width + padding);
+            
             const pillH = 24;
             const gap = 15;
-            const startX = (CANVAS_WIDTH - (pillW * 2 + gap)) / 2;
             
-            ctx.font = "bold 10px Inter";
+            // Center the whole block
+            const totalWidth = dateW + gap + timeW;
+            const startX = (CANVAS_WIDTH - totalWidth) / 2;
             
+            // Use middle baseline for perfect vertical alignment
+            ctx.textBaseline = "middle";
+            const textY = currentY + (pillH / 2);
+
             // Date Pill
             ctx.fillStyle = "rgba(24, 24, 27, 0.8)";
             ctx.strokeStyle = "#3f3f46";
-            drawRoundedRect(ctx, startX, currentY, pillW, pillH, 4);
+            drawRoundedRect(ctx, startX, currentY, dateW, pillH, 4);
             ctx.stroke();
             ctx.fillStyle = "#d4d4d8";
-            ctx.fillText("📅 " + date, startX + pillW/2, currentY + 16);
+            // textAlign is already center from previous section
+            ctx.fillText(dateStr, startX + dateW/2, textY);
 
             // Time Pill
+            const timeX = startX + dateW + gap;
             ctx.fillStyle = "rgba(24, 24, 27, 0.8)";
-            drawRoundedRect(ctx, startX + pillW + gap, currentY, pillW, pillH, 4);
+            drawRoundedRect(ctx, timeX, currentY, timeW, pillH, 4);
             ctx.stroke();
             ctx.fillStyle = "#d4d4d8";
-            ctx.fillText("⏰ " + time, startX + pillW + gap + pillW/2, currentY + 16);
+            ctx.fillText(timeStr, timeX + timeW/2, textY);
+            
+            // Reset baseline
+            ctx.textBaseline = "alphabetic";
 
-            return currentY + 60; // Increased Return Y for content start
+            return currentY + (isPresentation ? 30 : 60); // Reduced return padding for presentation
         }
 
-        async function drawFooter(ctx, yPosition, footerLeft, footerRight, sponsors) {
-             const footerH = 40; // Reduced height
+        async function drawFooter(ctx, yPosition, sponsors) {
+             const footerH = 80; // Increased height for bigger logos
              const startY = ctx.canvas.height - footerH;
              
              // Divider
@@ -869,62 +972,58 @@
              ctx.lineTo(CANVAS_WIDTH - 25, startY);
              ctx.strokeStyle = "rgba(255,255,255,0.1)";
              ctx.stroke();
+             
+             // Center Y of the footer area
+             const centerY = startY + (footerH / 2);
 
-             const contentY = startY + 28; // Adjusted for new height
-
-             // Left Text
+             // Sponsors Text - Left Aligned
+             ctx.fillStyle = "rgba(255,255,255,0.3)";
+             ctx.font = "bold 12px Inter";
              ctx.textAlign = "left";
-             ctx.font = "italic bold 10px Inter";
-             ctx.fillStyle = "#52525b";
-             ctx.fillText(footerLeft, 25, contentY);
+             ctx.textBaseline = "middle";
+             
+             const labelX = 25;
+             ctx.fillText("SPONSORS", labelX, centerY);
+             
+             // Measure text to position logos after it
+             const textMetrics = ctx.measureText("SPONSORS");
+             let currentX = labelX + textMetrics.width + 25; // 25px gap after text
 
-             // Right Text
-             ctx.textAlign = "right";
-             ctx.fillText(footerRight, CANVAS_WIDTH - 25, contentY);
-
-             // Sponsors
+             // Sponsors Logos - Row Layout
              if (sponsors && sponsors.length > 0) {
-                 const sponsorH = 26; // Reduced height to prevent protrusion
-                 let totalW = 0;
-                 const loadedSponsors = [];
+                 const sponsorH = 50; // Requested bigger logos (was 35)
                  
                  for (let src of sponsors) {
                      const img = await loadImage(src);
                      if(img) {
                          const w = img.width * (sponsorH / img.height);
-                         loadedSponsors.push({img, w});
-                         totalW += w + 10;
+                         // Vertically centered relative to the footer height
+                         ctx.drawImage(img, currentX, centerY - (sponsorH / 2), w, sponsorH);
+                         currentX += w + 20; // Gap between logos
                      }
                  }
-                 totalW -= 10; // remove last gap
-
-                 let currentX = (CANVAS_WIDTH - totalW) / 2;
-                 // Center vertically in footer (footerH is 40, sponsorH is 26) -> (40-26)/2 = 7px padding
-                 const sponsorY = startY + (footerH - sponsorH) / 2;
-                 
-                 for (let s of loadedSponsors) {
-                     ctx.drawImage(s.img, currentX, sponsorY, s.w, sponsorH);
-                     currentX += s.w + 10;
-                 }
              }
+             // Reset text baseline
+             ctx.textBaseline = "alphabetic";
         }
 
         // --- Render: Leaderboard ---
         async function drawLeaderboard(canvas) {
             const ctx = canvas.getContext('2d');
-            const bg = await loadImage(styles.backgroundImage);
-            const logo = await loadImage(styles.logoImage);
+            const s = styles[activeGroup];
+            const bg = await loadImage(s.backgroundImage);
+            const logo = await loadImage(s.logoImage);
             
             // Calculate dynamic height based on 12 rows
-            const headerH = 240; // Updated for increased header spacing
+            const headerH = 280; // Increased from 240 to accommodate bigger logo
             const rowH = 32;
             const rows = 12;
-            const footerH = 40;
+            const footerH = 80; // Increased to 80 for bigger sponsors
             const totalH = headerH + (rows * rowH) + footerH + 20; 
             
             canvas.height = totalH; // Resize canvas
 
-            let startY = await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+            let startY = await drawHeader(ctx, s.tournamentName, activeGroup, s.tournamentDate, s.tournamentTime, bg, logo, s.footerTextLeft, s.footerTextRight);
             
             // Header Row
             const colRank = 40;
@@ -1026,18 +1125,19 @@
                 ctx.fillText(t.points, colPts + 15, y + 21);
             }
 
-            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
+            await drawFooter(ctx, 0, s.sponsorLogos);
         }
 
         // --- Render: Top 3 ---
         async function drawTop3(canvas) {
             const ctx = canvas.getContext('2d');
-            const bg = await loadImage(styles.backgroundImage);
-            const logo = await loadImage(styles.logoImage);
+            const s = styles[activeGroup];
+            const bg = await loadImage(s.backgroundImage);
+            const logo = await loadImage(s.logoImage);
             
             canvas.height = 600; // Increased height for more space
 
-            await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+            await drawHeader(ctx, s.tournamentName, activeGroup, s.tournamentDate, s.tournamentTime, bg, logo, s.footerTextLeft, s.footerTextRight);
 
             const teams = getAggregatedData(activeGroup);
             const t1 = teams[0] || { name: 'TBD', kills: 0 };
@@ -1151,18 +1251,19 @@
             await drawPodiumBox(x3, w3, h3, t3, "#fb923c", "BRONZE", 3);
             await drawPodiumBox(x1, w1, h1, t1, "#facc15", "CHAMPION", 1);
 
-            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
+            await drawFooter(ctx, 0, s.sponsorLogos);
         }
 
         // --- Render: Confirmed ---
         async function drawConfirmed(canvas) {
             const ctx = canvas.getContext('2d');
-            const bg = await loadImage(styles.backgroundImage);
-            const logo = await loadImage(styles.logoImage);
+            const s = styles[activeGroup];
+            const bg = await loadImage(s.backgroundImage);
+            const logo = await loadImage(s.logoImage);
             
-            canvas.height = 600; // Increased height for more space
+            canvas.height = 700; // Increased from 650 to accommodate bigger logo header
             
-            let startY = await drawHeader(ctx, styles.tournamentName, activeGroup, styles.tournamentDate, styles.tournamentTime, bg, logo);
+            let startY = await drawHeader(ctx, s.tournamentName, activeGroup, s.tournamentDate, s.tournamentTime, bg, logo, s.footerTextLeft, s.footerTextRight);
             startY += 10; // Positive separation for better spacing
 
             const teams = data[activeGroup] || [];
@@ -1215,7 +1316,96 @@
                 }
             }
             
-            await drawFooter(ctx, 0, styles.footerTextLeft, styles.footerTextRight, styles.sponsorLogos);
+            await drawFooter(ctx, 0, s.sponsorLogos);
+        }
+
+        // --- Render: Presentation (Registration Open) ---
+        async function drawPresentation(canvas) {
+            const ctx = canvas.getContext('2d');
+            const s = styles[activeGroup];
+            const bg = await loadImage(s.backgroundImage);
+            const logo = await loadImage(s.logoImage);
+            
+            canvas.height = 600; 
+            
+            // Draw Header
+            let startY = await drawHeader(ctx, s.tournamentName, null, s.tournamentDate, s.tournamentTime, bg, logo, s.footerTextLeft, s.footerTextRight, true);
+            
+            // Central Content - Big Text
+            // MOVED UP: Fixed offset from startY instead of centered in remaining space
+            const centerY = startY + 60; 
+            
+            // Glow effect for text
+            ctx.shadowColor = "rgba(234, 88, 12, 0.5)";
+            ctx.shadowBlur = 30;
+            
+            ctx.textAlign = "center";
+            ctx.font = "900 italic 42px Orbitron, sans-serif";
+            
+            // Text 1: REGISTRATION
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("REGISTRATION", CANVAS_WIDTH / 2, centerY - 20);
+            
+            // Text 2: OPEN
+            ctx.fillStyle = "#ea580c"; // Orange
+            ctx.fillText("OPEN", CANVAS_WIDTH / 2, centerY + 20);
+            
+            ctx.shadowBlur = 0; // Reset shadow
+
+            // Decorative Box around text
+            const boxW = 400;
+            const boxH = 100;
+            ctx.strokeStyle = "rgba(234, 88, 12, 0.5)";
+            ctx.lineWidth = 2;
+            
+            // Draw brackets style box
+            const bx = (CANVAS_WIDTH - boxW) / 2;
+            const by = centerY - 50;
+            
+            // Top Left
+            ctx.beginPath();
+            ctx.moveTo(bx + 20, by);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(bx, by + 20);
+            ctx.stroke();
+
+            // Bottom Right
+            ctx.beginPath();
+            ctx.moveTo(bx + boxW - 20, by + boxH);
+            ctx.lineTo(bx + boxW, by + boxH);
+            ctx.lineTo(bx + boxW, by + boxH - 20);
+            ctx.stroke();
+
+            // Draw Price
+            if (s.registrationPrice) {
+                const priceY = centerY + 70; 
+                
+                // Background Pill for Price
+                ctx.font = "bold 14px Orbitron"; // Measure text
+                const priceText = `ENTRY: ${s.registrationPrice}`;
+                const tm = ctx.measureText(priceText);
+                const pillW = tm.width + 60;
+                const pillH = 36;
+                const pillX = (CANVAS_WIDTH - pillW) / 2;
+                
+                ctx.fillStyle = "rgba(0, 48, 135, 0.8)"; // Paypal Blue-ish
+                ctx.strokeStyle = "#009cde";
+                ctx.lineWidth = 1;
+                drawRoundedRect(ctx, pillX, priceY, pillW, pillH, 18);
+                ctx.stroke();
+                
+                // Text
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.fillText(priceText, CANVAS_WIDTH / 2, priceY + 23);
+                
+                // Paypal Label (Small) below
+                ctx.font = "italic 10px Inter";
+                ctx.fillStyle = "#a1a1aa";
+                ctx.fillText("PAYMENT VIA PAYPAL", CANVAS_WIDTH / 2, priceY + 45);
+            }
+
+            await drawFooter(ctx, 0, s.sponsorLogos);
         }
 
         // --- Main Draw Controller ---
@@ -1230,6 +1420,7 @@
              if(type === 'results') await drawLeaderboard(canvas);
              if(type === 'top3') await drawTop3(canvas);
              if(type === 'confirmed') await drawConfirmed(canvas);
+             if(type === 'presentation') await drawPresentation(canvas);
              
              // Scale down for preview if needed via CSS, but canvas stays hi-res
              canvas.style.maxWidth = "100%";
@@ -1242,6 +1433,7 @@
              renderCanvas('results', 'preview-results');
              renderCanvas('top3', 'preview-top3');
              renderCanvas('confirmed', 'preview-confirmed');
+             renderCanvas('presentation', 'preview-presentation');
              renderGroupButtons();
         }
 
@@ -1249,7 +1441,8 @@
             const canvas = document.getElementById("canvas-" + type);
             if(canvas) {
                 const link = document.createElement('a');
-                const cleanName = (styles.tournamentName || 'XT_UND').replace(/[^a-z0-9]/gi, '_');
+                // Use the style name of the current group
+                const cleanName = (styles[activeGroup].tournamentName || 'XT_UND').replace(/[^a-z0-9]/gi, '_');
                 link.download = `${cleanName}_${type}_${activeGroup}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0); // Max quality
                 link.click();
@@ -1280,8 +1473,12 @@
             });
 
             // Settings Listeners
-            ['tournamentName', 'tournamentDate', 'tournamentTime', 'footerTextLeft', 'footerTextRight'].forEach(id => {
-                document.getElementById(id).addEventListener('input', (e) => { styles[id] = e.target.value; saveStyles(); renderAll(); });
+            ['tournamentName', 'tournamentDate', 'tournamentTime', 'registrationPrice', 'footerTextLeft', 'footerTextRight'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => { 
+                    styles[activeGroup][id] = e.target.value; 
+                    saveStyles(); 
+                    renderAll(); 
+                });
             });
 
             // Image Uploads
@@ -1290,7 +1487,14 @@
             document.getElementById('addSponsorInput').addEventListener('change', (e) => {
                  if(e.target.files[0]){
                     const r = new FileReader();
-                    r.onload = (evt) => { if(!styles.sponsorLogos) styles.sponsorLogos=[]; styles.sponsorLogos.push(evt.target.result); saveStyles(); renderSponsorListInSettings(); renderAll(); e.target.value=''; };
+                    r.onload = (evt) => { 
+                        if(!styles[activeGroup].sponsorLogos) styles[activeGroup].sponsorLogos=[]; 
+                        styles[activeGroup].sponsorLogos.push(evt.target.result); 
+                        saveStyles(); 
+                        renderSponsorListInSettings(); 
+                        renderAll(); 
+                        e.target.value=''; 
+                    };
                     r.readAsDataURL(e.target.files[0]);
                  }
             });
@@ -1299,7 +1503,6 @@
             loadData().then(() => {
                 setView('LEADERBOARD');
                 renderGroupButtons();
-                renderSponsorListInSettings();
             });
         };
 
