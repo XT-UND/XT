@@ -101,8 +101,6 @@
 
       /* Leaderboard Specific Styles */
       .text-gold { color: #fbbf24; }
-      .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-      .text-shadow-sm { text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
       
       .bg-rank-1 { background: linear-gradient(90deg, #ea580c 0%, #9a3412 100%); }
       .bg-rank-3 { background: linear-gradient(90deg, #9a3412 0%, #431407 100%); }
@@ -121,7 +119,7 @@
                 </div>
                 <h1 class="text-lg font-bold text-white tracking-wide font-gamer"><span id="app-header-title">XT UND</span> <span class="text-orange-500 text-xs font-normal align-middle ml-1">MANAGER</span></h1>
             </div>
-            <div class="text-xs text-gray-500 font-medium">v6.9.2 Logo Size Fix</div>
+            <div class="text-xs text-gray-500 font-medium">v7.0 Prizes Added</div>
         </div>
         
         <!-- Group Selector (Horizontal Scroll) -->
@@ -267,6 +265,25 @@
                     </div>
                 </div>
 
+                <!-- Section: Prizes (Presentation Only) -->
+                <div class="card">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Prizes (Presentation Only)</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-xs text-orange-400 block mb-1">Top 1</label>
+                            <input type="text" id="prize1" class="input-modern" placeholder="€100">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">Top 2</label>
+                            <input type="text" id="prize2" class="input-modern" placeholder="€50">
+                        </div>
+                        <div>
+                            <label class="text-xs text-orange-700 block mb-1">Top 3</label>
+                            <input type="text" id="prize3" class="input-modern" placeholder="€20">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section: Top Text -->
                 <div class="card">
                     <h3 class="text-sm font-bold text-gray-300 uppercase mb-4 border-b border-gray-800 pb-2">Top Banner Text</h3>
@@ -349,7 +366,7 @@
             
             <button onclick="setView('LEADERBOARD')" id="nav-leaderboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active:text-orange-500 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                 </svg>
                 <span class="text-[10px] font-medium">Results</span>
             </button>
@@ -389,6 +406,9 @@
             footerTextLeft: 'EUROPA FREE FIRE',
             footerTextCenter: '',
             footerTextRight: 'XT UND SERIES',
+            prize1: '',
+            prize2: '',
+            prize3: '',
             logoImage: null, 
             backgroundImage: null, 
             sponsorLogos: [],
@@ -603,6 +623,11 @@
                 document.getElementById('registrationPrice').value = s.registrationPrice || ''; // New
                 document.getElementById('footerTextLeft').value = s.footerTextLeft || '';
                 document.getElementById('footerTextRight').value = s.footerTextRight || '';
+                
+                // Update Prizes
+                document.getElementById('prize1').value = s.prize1 || '';
+                document.getElementById('prize2').value = s.prize2 || '';
+                document.getElementById('prize3').value = s.prize3 || '';
                 
                 // Update Image Previews in Settings
                 updateImagePreview('preview-logo-container', s.logoImage, '🛡️');
@@ -883,10 +908,7 @@
             ctx.font = FONT_GAMER;
             ctx.fillStyle = "#ffffff";
             ctx.textAlign = "center";
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.shadowBlur = 10;
             ctx.fillText(title.toUpperCase(), CANVAS_WIDTH / 2, currentY + 10);
-            ctx.shadowBlur = 0;
             currentY += isPresentation ? 25 : 30; // Compact gap for presentation
 
             // Subtitle
@@ -1201,10 +1223,7 @@
                 ctx.fillStyle = "#fff";
                 ctx.font = "900 12px Orbitron";
                 ctx.textAlign = "center";
-                ctx.shadowColor = "black";
-                ctx.shadowBlur = 4;
                 ctx.fillText(team.name.toUpperCase(), x + width/2, boxY + 25);
-                ctx.shadowBlur = 0;
 
                 // Rank Name
                 ctx.fillStyle = rankColor;
@@ -1335,10 +1354,6 @@
             // MOVED UP: Fixed offset from startY instead of centered in remaining space
             const centerY = startY + 60; 
             
-            // Glow effect for text
-            ctx.shadowColor = "rgba(234, 88, 12, 0.5)";
-            ctx.shadowBlur = 30;
-            
             ctx.textAlign = "center";
             ctx.font = "900 italic 42px Orbitron, sans-serif";
             
@@ -1350,7 +1365,6 @@
             ctx.fillStyle = "#ea580c"; // Orange
             ctx.fillText("OPEN", CANVAS_WIDTH / 2, centerY + 20);
             
-            ctx.shadowBlur = 0; // Reset shadow
 
             // Decorative Box around text
             const boxW = 400;
@@ -1376,9 +1390,55 @@
             ctx.lineTo(bx + boxW, by + boxH - 20);
             ctx.stroke();
 
+            // PRIZES DISPLAY (New)
+            // Positioned between "OPEN" and "Price"
+            if (s.prize1 || s.prize2 || s.prize3) {
+                 const pY = centerY + 65;
+                 ctx.font = "bold 12px Orbitron";
+                 
+                 const drawPrize = (txt, x, color) => {
+                     if(!txt) return;
+                     
+                     // Measure for box
+                     const tm = ctx.measureText(txt);
+                     const padding = 24; 
+                     const w = Math.max(90, tm.width + padding); // Min width so short text like "€20" doesn't look like a square
+                     const h = 24;
+                     const bx = x - w/2;
+                     const by = pY - h/2;
+
+                     // Draw Box (Like Date/Time)
+                     ctx.fillStyle = "rgba(24, 24, 27, 0.8)";
+                     ctx.strokeStyle = "#3f3f46";
+                     drawRoundedRect(ctx, bx, by, w, h, 4);
+                     ctx.stroke();
+
+                     // Text
+                     ctx.fillStyle = color;
+                     
+                     ctx.textBaseline = "middle";
+                     ctx.fillText(txt, x, pY);
+                     ctx.textBaseline = "alphabetic";
+                 };
+
+                 // Calculate positions based on what's available
+                 const p1 = s.prize1 ? `🥇 ${s.prize1}` : '';
+                 const p2 = s.prize2 ? `🥈 ${s.prize2}` : '';
+                 const p3 = s.prize3 ? `🥉 ${s.prize3}` : '';
+                 
+                 // Center based on count, but fixed positions look cleaner
+                 // Left (2nd), Center (1st), Right (3rd)
+                 
+                 ctx.textAlign = "center";
+                 
+                 if (p1) drawPrize(p1, CANVAS_WIDTH / 2, "#fbbf24"); // Gold
+                 if (p2) drawPrize(p2, CANVAS_WIDTH / 2 - 120, "#e5e7eb"); // Silver
+                 if (p3) drawPrize(p3, CANVAS_WIDTH / 2 + 120, "#ea580c"); // Bronze
+            }
+
             // Draw Price
             if (s.registrationPrice) {
-                const priceY = centerY + 70; 
+                const priceY = centerY + 95; // Moved down to fit prizes
                 
                 // Background Pill for Price
                 ctx.font = "bold 14px Orbitron"; // Measure text
@@ -1473,7 +1533,7 @@
             });
 
             // Settings Listeners
-            ['tournamentName', 'tournamentDate', 'tournamentTime', 'registrationPrice', 'footerTextLeft', 'footerTextRight'].forEach(id => {
+            ['tournamentName', 'tournamentDate', 'tournamentTime', 'registrationPrice', 'footerTextLeft', 'footerTextRight', 'prize1', 'prize2', 'prize3'].forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => { 
                     styles[activeGroup][id] = e.target.value; 
                     saveStyles(); 
